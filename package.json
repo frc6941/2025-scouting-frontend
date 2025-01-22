@@ -9,13 +9,17 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
     "@heroui/badge": "^2.2.6",
     "@heroui/chip": "^2.2.7",
     "@heroui/input": "^2.4.10",
     "@heroui/react": "^2.6.14",
     "@heroui/switch": "^2.2.9",
     "@heroui/system": "^2.4.7",
+    "@heroui/tabs": "^2.2.8",
     "@heroui/theme": "^2.4.6",
+    "@mui/icons-material": "^6.4.1",
     "@radix-ui/react-dialog": "^1.1.4",
     "@radix-ui/react-separator": "^1.1.1",
     "@radix-ui/react-slot": "^1.1.1",

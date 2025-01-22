@@ -3,8 +3,9 @@
 import { useForm } from "@/app/scouting/contexts/FormContent";
 import { useRouter } from "next/navigation";
 import {Chip} from "@heroui/chip";
-import {Ban, Minus, PersonStanding, Plus, ShoppingBasket} from "lucide-react";
-import {Button} from "@heroui/react";
+import {Ban, Minus, PersonStanding, Plus, ShoppingBasket} from "lucide-react"
+import { Card, Button, Tooltip } from "@heroui/react";
+import { Add as AddIcon, Remove as RemoveIcon } from "@mui/icons-material";
 
 export default function Step3() {
   // @ts-ignore
@@ -12,75 +13,201 @@ export default function Step3() {
   const router = useRouter();
 
   const handleNext = () => {
-    router.push("/scouting/step4");
+    router.push("/scouting/step5");
   };
 
   function handleGoBack(){
-    router.push("/scouting/step2");
+    router.push("/scouting/step3");
   }
+// CounterButton component for reusability
+
+
+// Styled counter button with ripple effect and Material Design elevation
+  const CounterButton = ({placement, onClick, icon: Icon, label }) => (
+    <Tooltip content={label}
+             classNames={{content:"text-default-600"}}
+             placement={placement}>
+      <button
+        onClick={onClick}
+        className="p-2 rounded-full hover:bg-gray-300  transition-all duration-200 active:bg-gray-300"
+        aria-label={label}
+      >
+        <Icon className="text-default-600" />
+      </button>
+    </Tooltip>
+  );
+
+  const Counter = ({ label, value, onIncrement, onDecrement }) => (
+    <Card className="w-full p-4 backdrop-blur-sm hover:shadow-md transition-shadow duration-200 border-1  border-black dark:border-white">
+      <div className="flex items-center justify-between gap-4">
+        <CounterButton
+          placement="right"
+          onClick={onDecrement}
+          icon={RemoveIcon}
+          label={`Decrease ${label}`}
+        />
+        <div className="flex-1 text-center">
+          <span className="text-sm text-default-600 block">{label}</span>
+          <span className="text-2xl font-google-sans">{value}</span>
+        </div>
+        <CounterButton
+          placement="left"
+          onClick={onIncrement}
+          icon={AddIcon}
+          label={`Increase ${label}`}
+        />
+      </div>
+    </Card>
+  );
+
+  const AlgaeCounter = ({label, value, onIncrement, onDecrement, icon: Icon }) => (
+    <Card className="w-full p-4 backdrop-blur-md hover:shadow-lg transition-shadow duration-200 border-1  border-black dark:border-white">
+      <div className="flex items-center justify-between gap-4">
+        <CounterButton
+          placement="right"
+          onClick={onDecrement}
+          icon={RemoveIcon}
+          label={`Decrease ${label}`}
+        />
+        <div className="flex-1 flex items-center justify-center gap-3">
+          <Icon className="text-default-600 text-2xl" />
+          <div className="text-center">
+            <span className="text-sm text-default-600 block">{label}</span>
+            <span className="text-2xl font-google-sans">{value}</span>
+          </div>
+        </div>
+        <CounterButton
+          placement="left"
+          onClick={onIncrement}
+          icon={AddIcon}
+          label={`Increase ${label}`}
+        />
+      </div>
+    </Card>
+  );
 
   return (
-    <main>
-      <div className="flex justify-center pr-40 font-extrabold"><p className="text-5xl">Autonomous</p></div>
-      <div className="flex justify-center gap-14">
-        {/*leftSide*/}
-        <div className="flex flex-col justify-between gap-6">
-          <div className="flex justify-center  font-extrabold"><p className="text-3xl pl-14">Coral</p></div>
-          <div className="flex justify-between gap-4">
-            <div className="pt-1.5" onClick={()=>{setFormData({...formData, autonomous: {...formData.autonomous, coralCount: {...formData.autonomous.coralCount, l4: formData.autonomous.coralCount.l4-1}}})}}><Chip variant="shadow" className="py-6"><Minus /></Chip></div>
-            <Chip size="lg" variant="shadow" className="px-16 py-8 text-2xl">L4:<strong>{formData.autonomous.coralCount.l4}</strong></Chip>
-            <div className="pt-2" onClick={()=>{setFormData({...formData, autonomous: {...formData.autonomous, coralCount: {...formData.autonomous.coralCount, l4: formData.autonomous.coralCount.l4+1}}})}}><Chip variant="shadow" className="py-6"><Plus /></Chip></div>
-          </div>
-          <div className="flex justify-between gap-4">
-            <div className="pt-1.5" onClick={()=>{setFormData({...formData, autonomous: {...formData.autonomous, coralCount: {...formData.autonomous.coralCount, l3: formData.autonomous.coralCount.l3-1}}})}}><Chip variant="shadow" className="py-6"><Minus /></Chip></div>
-            <Chip size="lg" variant="shadow" className="px-16 py-8 text-2xl">L3: <strong>{formData.autonomous.coralCount.l3}</strong></Chip>
-            <div className="pt-2" onClick={()=>{setFormData({...formData, autonomous: {...formData.autonomous, coralCount: {...formData.autonomous.coralCount, l3: formData.autonomous.coralCount.l3+1}}})}}><Chip variant="shadow" className="py-6"><Plus /></Chip></div>
-          </div>
-          <div className="flex justify-between gap-4">
-            <div className="pt-1.5" onClick={()=>{setFormData({...formData, autonomous: {...formData.autonomous, coralCount: {...formData.autonomous.coralCount, l2: formData.autonomous.coralCount.l2-1}}})}}><Chip variant="shadow" className="py-6"><Minus /></Chip></div>
-            <Chip size="lg" variant="shadow" className="px-16 py-8 text-2xl">L2: <strong>{formData.autonomous.coralCount.l2}</strong></Chip>
-            <div className="pt-2" onClick={()=>{setFormData({...formData, autonomous: {...formData.autonomous, coralCount: {...formData.autonomous.coralCount, l2: formData.autonomous.coralCount.l2+1}}})}}><Chip variant="shadow" className="py-6"><Plus /></Chip></div>
-          </div>
-          <div className="flex justify-between gap-4">
-            <div className="pt-1.5" onClick={()=>{setFormData({...formData, autonomous: {...formData.autonomous, coralCount: {...formData.autonomous.coralCount, l1: formData.autonomous.coralCount.l1-1}}})}}><Chip variant="shadow" className="py-6"><Minus /></Chip></div>
-            <Chip size="lg" variant="shadow" className="px-16 py-8 text-2xl">L1: <strong>{formData.autonomous.coralCount.l1}</strong></Chip>
-            <div className="pt-2" onClick={()=>{setFormData({...formData, autonomous: {...formData.autonomous, coralCount: {...formData.autonomous.coralCount, l1: formData.autonomous.coralCount.l1+1}}})}}><Chip variant="shadow" className="py-6"><Plus /></Chip></div>
-          </div>
-          <div className="flex justify-between gap-4">
-            <div className="pt-1.5" onClick={()=>{setFormData({...formData, autonomous: {...formData.autonomous, coralCount: {...formData.autonomous.coralCount, dropOrMiss: formData.autonomous.coralCount.dropOrMiss-1}}})}}><Chip variant="shadow" className="py-6"><Minus /></Chip></div>
-            <Chip size="lg" variant="shadow" className="px-12 py-8 text-2xl">Miss: <strong>{formData.autonomous.coralCount.dropOrMiss}</strong></Chip>
-            <div className="pt-2" onClick={()=>{setFormData({...formData, autonomous: {...formData.autonomous, coralCount: {...formData.autonomous.coralCount, dropOrMiss: formData.autonomous.coralCount.dropOrMiss+1}}})}}><Chip variant="shadow" className="py-6"><Plus /></Chip></div>
-          </div>
-        </div>
-        {/*rightSide*/}
-        <div className="flex flex-col  gap-4">
-          <div className="flex justify-center  font-extrabold"><p className="text-3xl pl-14">Algae</p></div>
-          <div className="flex justify-between gap-6">
-            <div className="pt-10" onClick={()=>{setFormData({...formData, autonomous: {...formData.autonomous, algaeCount: {...formData.autonomous.algaeCount, netShot: formData.autonomous.algaeCount.netShot-1}}})}}><Chip variant="shadow" className="py-6"><Minus /></Chip></div>
-            <Chip size="lg" variant="shadow" className="px-10 py-16 text-2xl"><strong>Net Shot</strong><div className="flex justify-start gap-3"><ShoppingBasket size={40}/><strong className="pt-1">:</strong> <strong className="pt-1.5">{formData.autonomous.algaeCount.netShot}</strong></div></Chip>
-            <div className="pt-10" onClick={()=>{setFormData({...formData, autonomous: {...formData.autonomous, algaeCount: {...formData.autonomous.algaeCount, netShot: formData.autonomous.algaeCount.netShot+1}}})}}><Chip variant="shadow" className="py-6"><Plus /></Chip></div>
-          </div>
-          <div className="flex justify-between gap-6">
-            <div className="pt-10" onClick={()=>{setFormData({...formData, autonomous: {...formData.autonomous, algaeCount: {...formData.autonomous.algaeCount, processor: formData.autonomous.algaeCount.processor-1}}})}}><Chip variant="shadow" className="py-6"><Minus /></Chip></div>
-            <Chip size="lg" variant="shadow" className="px-10 py-16 text-2xl"><strong>Processor</strong><div className="flex justify-start gap-3"><PersonStanding  size={40}/><strong className="pt-1">:</strong> <strong className="pt-1.5">{formData.autonomous.algaeCount.processor}</strong></div></Chip>
-            <div className="pt-10" onClick={()=>{setFormData({...formData, autonomous: {...formData.autonomous, algaeCount: {...formData.autonomous.algaeCount, processor: formData.autonomous.algaeCount.processor+1}}})}}><Chip variant="shadow" className="py-6"><Plus /></Chip></div>
-          </div>
-          <div className="flex justify-between gap-6">
-            <div className="pt-10" onClick={()=>{setFormData({...formData, autonomous: {...formData.autonomous, algaeCount: {...formData.autonomous.algaeCount, dropOrMiss: formData.autonomous.algaeCount.dropOrMiss-1}}})}}><Chip variant="shadow" className="py-6"><Minus /></Chip></div>
-            <Chip size="lg" variant="shadow" className="px-10 py-16 text-2xl"><strong>Miss</strong><div className="flex justify-start gap-3"><Ban  size={40}/><strong className="pt-1">:</strong> <strong className="pt-1.5">{formData.autonomous.algaeCount.dropOrMiss}</strong></div></Chip>
-            <div className="pt-10" onClick={()=>{setFormData({...formData, autonomous: {...formData.autonomous, algaeCount: {...formData.autonomous.algaeCount, dropOrMiss: formData.autonomous.algaeCount.dropOrMiss+1}}})}}><Chip variant="shadow" className="py-6"><Plus /></Chip></div>
-          </div>
-        </div>
+    <main className="container mx-auto px-4 py-8 max-w-4xl">
+      <div className="text-center mb-8">
+        <h1 className="text-3xl font-google-sans font-extrabold mb-1">Autonomous</h1>
+        <div className="h-1 w-16 bg-primary mx-auto rounded-full"/>
       </div>
-      <div className="flex justify-center gap-[480px] mt-8">
-        <Button  variant="bordered" className="px-8 py-8 text-2xl" onPressStart={handleGoBack}>
+
+      <div className="grid md:grid-cols-2 gap-8">
+        {/* Coral Section */}
+        <section className="space-y-6">
+          <h2 className="text-xl font-google-sans ml-4">Coral</h2>
+          <div className="space-y-4">
+            {['L4', 'L3', 'L2', 'L1'].map(level => (
+              <Counter
+                key={level}
+                label={level}
+                value={formData.autonomous.coralCount[level.toLowerCase()]}
+                onIncrement={() => setFormData(prev => ({
+                  ...prev,
+                  autonomous: {
+                    ...prev.autonomous,
+                    coralCount: {
+                      ...prev.autonomous.coralCount,
+                      [level.toLowerCase()]: prev.autonomous.coralCount[level.toLowerCase()] + 1
+                    }
+                  }
+                }))}
+                onDecrement={() => setFormData(prev => ({
+                  ...prev,
+                  autonomous: {
+                    ...prev.autonomous,
+                    coralCount: {
+                      ...prev.autonomous.coralCount,
+                      [level.toLowerCase()]: prev.autonomous.coralCount[level.toLowerCase()] - 1
+                    }
+                  }
+                }))}
+              />
+            ))}
+            <Counter
+              label="Miss"
+              value={formData.autonomous.coralCount.dropOrMiss}
+              onIncrement={() => setFormData(prev => ({
+                ...prev,
+                autonomous: {
+                  ...prev.autonomous,
+                  coralCount: {
+                    ...prev.autonomous.coralCount,
+                    dropOrMiss: prev.autonomous.coralCount.dropOrMiss + 1
+                  }
+                }
+              }))}
+              onDecrement={() => setFormData(prev => ({
+                ...prev,
+                autonomous: {
+                  ...prev.autonomous,
+                  coralCount: {
+                    ...prev.autonomous.coralCount,
+                    dropOrMiss: prev.autonomous.coralCount.dropOrMiss - 1
+                  }
+                }
+              }))}
+            />
+          </div>
+        </section>
+
+        {/* Algae Section */}
+        <section className="space-y-6">
+          <h2 className="text-xl font-google-sans ml-4">Algae</h2>
+          <div className="space-y-4">
+            {[
+              { key: 'netShot', label: 'Net Shot', Icon: ShoppingBasket },
+              { key: 'processor', label: 'Processor', Icon: PersonStanding },
+              { key: 'dropOrMiss', label: 'Miss', Icon: Ban }
+            ].map(({ key, label, Icon }) => (
+              <AlgaeCounter
+                key={key}
+                label={label}
+                value={formData.autonomous.algaeCount[key]}
+                icon={Icon}
+                onIncrement={() => setFormData(prev => ({
+                  ...prev,
+                  autonomous: {
+                    ...prev.autonomous,
+                    algaeCount: {
+                      ...prev.autonomous.algaeCount,
+                      [key]: prev.autonomous.algaeCount[key] + 1
+                    }
+                  }
+                }))}
+                onDecrement={() => setFormData(prev => ({
+                  ...prev,
+                  autonomous: {
+                    ...prev.autonomous,
+                    algaeCount: {
+                      ...prev.autonomous.algaeCount,
+                      [key]: prev.autonomous.algaeCount[key] - 1
+                    }
+                  }
+                }))}
+              />
+            ))}
+          </div>
+        </section>
+      </div>
+
+      {/* Navigation Buttons */}
+      <div className="flex justify-between mt-12 px-4">
+        <Button
+          variant="flat"
+          className="font-google-sans px-8"
+          onPress={handleGoBack}
+        >
           Back
         </Button>
-        <Button  variant="bordered" className="px-8 py-8 text-2xl"
-                 onPressStart={handleNext}>
-          Proceed
+        <Button
+          color="primary"
+          className="font-google-sans px-8"
+          onPress={handleNext}
+        >
+          Next
         </Button>
       </div>
     </main>
-  );
-}
+  )}
