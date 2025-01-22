@@ -1,172 +1,161 @@
-/**
- * @fileoverview Match Information form component - Step 1
- * Created: 2025-01-22 18:23:50 UTC
- * Author: eR3R3
- */
-
 'use client';
 
-import {useForm} from '@/app/scouting/contexts/FormContent';
-import {useRouter} from 'next/navigation';
-import {Input} from '@heroui/input';
-import {Button} from '@heroui/react';
+import { useForm } from "@/app/scouting/contexts/FormContent";
+import { useRouter } from "next/navigation";
+import { Input } from "@heroui/input";
+import { Button, Card } from "@heroui/react";
 
-/**
- * Step1 component handles the first step of match scouting form.
- * @return {JSX.Element} The rendered form component
- */
 export default function Step1() {
   // @ts-ignore
-  const {formData, setFormData} = useForm();
+  const { formData, setFormData } = useForm();
   const router = useRouter();
 
   const handleNext = () => {
-    router.push('/scouting/step2');
+    router.push("/scouting/step2");
   };
 
   const handleGoBack = () => {
-    router.push('/');
+    router.push("/");
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center w-full p-4 sm:p-6 md:p-8">
-      <div className="w-full h-full max-w-6xl flex flex-col gap-4 sm:gap-6 md:gap-8">
-        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-center mb-4 sm:mb-6">
+    <main className="container mx-auto px-6 py-12 max-w-7xl min-h-screen">
+      <div className="text-center mb-12">
+        <h1 className="text-5xl font-google-sans font-extrabold mb-3">
           Match Information
         </h1>
-
-        <div className="flex flex-col lg:grid lg:grid-cols-2 gap-4 sm:gap-6 md:gap-8 flex-grow w-full">
-          {/* Left Section */}
-          <div className="flex flex-col gap-4 sm:gap-6 md:gap-8">
-            {/* Match Type Input */}
-            <div>
-              <label className="block text-lg sm:text-xl font-semibold mb-2">
-                Match Type
-              </label>
-              <Input
-                size="lg"
-                label="Match Number"
-                className="focus:ring focus:outline-none w-full"
-                value={formData.matchType}
-                onChange={(e) => setFormData({
-                  ...formData,
-                  matchType: e.target.value,
-                })}
-              />
-            </div>
-
-            {/* Scouter Initials Input */}
-            <div>
-              <label
-                className="block text-lg sm:text-xl font-semibold mb-2"
-                htmlFor="initials"
-              >
-                Scouter Initials
-              </label>
-              <Input
-                size="lg"
-                label="Scouter Name"
-                className="focus:ring focus:outline-none w-full"
-                value={formData.scouter}
-                onChange={(e) => setFormData({
-                  ...formData,
-                  scouter: e.target.value,
-                })}
-              />
-            </div>
-          </div>
-
-          {/* Right Section */}
-          <div className="flex flex-col gap-4 sm:gap-6 md:gap-8 w-full">
-            {/* Match Number and Team Number Inputs */}
-            <div className="flex flex-col sm:flex-row justify-center w-full gap-4 sm:gap-5">
-              <div className="w-full">
-                <label className="block text-lg sm:text-xl font-semibold w-full mb-2">
-                  Enter Match Number
-                </label>
-                <Input
-                  size="lg"
-                  label="Match Number"
-                  className="focus:ring focus:outline-none w-full"
-                  value={formData.matchNumber}
-                  onChange={(e) => setFormData({
-                    ...formData,
-                    matchNumber: e.target.value,
-                  })}
-                />
-              </div>
-              <div className="w-full">
-                <label className="block text-lg sm:text-xl font-semibold mb-2">
-                  Enter Team Number
-                </label>
-                <Input
-                  size="lg"
-                  label="Team Number"
-                  className="focus:ring focus:outline-none w-full"
-                  value={formData.team}
-                  onChange={(e) => setFormData({
-                    ...formData,
-                    team: e.target.value,
-                  })}
-                />
-              </div>
-            </div>
-
-            {/* Alliance Selection */}
-            <div>
-              <label className="block text-lg sm:text-xl font-medium mb-2">
-                Select Alliance
-              </label>
-              <div className="flex gap-4 sm:gap-8">
-                <button
-                  className={`
-                    flex-1 px-2 sm:px-4 py-3 sm:py-4 rounded-md 
-                    text-base sm:text-xl border transition-colors
-                    ${formData.alliance === 'red'
-                    ? 'bg-red-500 text-white'
-                    : 'hover:bg-red-100'}
-                  `}
-                  onClick={() => setFormData({...formData, alliance: 'red'})}
-                >
-                  Red
-                </button>
-                <button
-                  className={`
-                    flex-1 px-2 sm:px-4 py-3 sm:py-4 rounded-md 
-                    text-base sm:text-xl border transition-colors
-                    ${formData.alliance === 'blue'
-                    ? 'bg-blue-500 text-white'
-                    : 'hover:bg-blue-100'}
-                  `}
-                  onClick={() => setFormData({...formData, alliance: 'blue'})}
-                >
-                  Blue
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Navigation Buttons */}
-        <div className="flex justify-between mt-4 sm:mt-6 md:mt-8">
-          <Button
-            variant="bordered"
-            className="px-4 sm:px-6 md:px-8 py-4 sm:py-6 md:py-8
-                     text-lg sm:text-xl md:text-2xl"
-            onPressStart={handleGoBack}
-          >
-            Back
-          </Button>
-          <Button
-            variant="bordered"
-            className="px-4 sm:px-6 md:px-8 py-4 sm:py-6 md:py-8
-                     text-lg sm:text-xl md:text-2xl"
-            onPressStart={handleNext}
-          >
-            Proceed
-          </Button>
-        </div>
+        <div className="h-2 w-24 bg-primary mx-auto rounded-full"/>
       </div>
-    </div>
+
+      <div className="grid md:grid-cols-2 gap-12">
+        {/* Left Section */}
+        <section className="space-y-8">
+          <Card className="p-8 backdrop-blur-md hover:shadow-xl transition-shadow duration-300 border-2 border-black dark:border-white">
+            <div className="space-y-8">
+              <div>
+                <label className="text-xl text-default-600 block mb-3 font-google-sans font-extrabold">
+                  Match Type
+                </label>
+                <Input
+                  size="lg"
+                  className="w-full backdrop-blur-sm text-lg py-6"
+                  placeholder="Enter match type"
+                  value={formData.matchType}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    matchType: e.target.value,
+                  })}
+                />
+              </div>
+
+              <div>
+                <label className="text-xl text-default-600 block mb-3 font-google-sans font-extrabold">
+                  Scouter Initials
+                </label>
+                <Input
+                  size="lg"
+                  className="w-full backdrop-blur-sm text-lg py-6"
+                  placeholder="Enter your initials"
+                  value={formData.scouter}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    scouter: e.target.value,
+                  })}
+                />
+              </div>
+            </div>
+          </Card>
+        </section>
+
+        {/* Right Section */}
+        <section className="space-y-8">
+          <Card className="p-8 backdrop-blur-md hover:shadow-xl transition-shadow duration-300 border-2 border-black dark:border-white">
+            <div className="space-y-8">
+              <div className="grid grid-cols-2 gap-6">
+                <div>
+                  <label className="text-xl text-default-600 block mb-3 font-google-sans font-extrabold">
+                    Match Number
+                  </label>
+                  <Input
+                    size="lg"
+                    className="w-full backdrop-blur-sm text-lg py-6"
+                    placeholder="Enter match #"
+                    value={formData.matchNumber}
+                    onChange={(e) => setFormData({
+                      ...formData,
+                      matchNumber: e.target.value,
+                    })}
+                  />
+                </div>
+                <div>
+                  <label className="text-xl text-default-600 block mb-3 font-google-sans font-extrabold">
+                    Team Number
+                  </label>
+                  <Input
+                    size="lg"
+                    className="w-full backdrop-blur-sm text-lg py-6"
+                    placeholder="Enter team #"
+                    value={formData.team}
+                    onChange={(e) => setFormData({
+                      ...formData,
+                      team: e.target.value,
+                    })}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="text-xl text-default-600 block mb-3 font-google-sans font-extrabold">
+                  Select Alliance
+                </label>
+                <div className="flex gap-6">
+                  <button
+                    className={`
+                      flex-1 px-6 py-5 rounded-lg font-google-sans text-xl
+                      transition-all duration-300 transform hover:scale-105
+                      ${formData.alliance === 'red'
+                      ? 'bg-red-500 text-white shadow-lg'
+                      : 'hover:bg-red-100 border-2 border-red-500'}
+                    `}
+                    onClick={() => setFormData({...formData, alliance: 'red'})}
+                  >
+                    Red Alliance
+                  </button>
+                  <button
+                    className={`
+                      flex-1 px-6 py-5 rounded-lg font-google-sans text-xl
+                      transition-all duration-300 transform hover:scale-105
+                      ${formData.alliance === 'blue'
+                      ? 'bg-blue-500 text-white shadow-lg'
+                      : 'hover:bg-blue-100 border-2 border-blue-500'}
+                    `}
+                    onClick={() => setFormData({...formData, alliance: 'blue'})}
+                  >
+                    Blue Alliance
+                  </button>
+                </div>
+              </div>
+            </div>
+          </Card>
+        </section>
+      </div>
+
+      <div className="flex justify-between mt-16 px-6">
+        <Button
+          variant="flat"
+          size="lg"
+          className="font-google-sans px-12 py-6 text-xl"
+          onPress={handleGoBack}>
+          Back
+        </Button>
+        <Button
+          color="primary"
+          size="lg"
+          className="font-google-sans px-12 py-6 text-xl"
+          onPress={handleNext}>
+          Next
+        </Button>
+      </div>
+    </main>
   );
 }

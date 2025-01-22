@@ -56,7 +56,7 @@ export function ThemeSwitcher() {
     <div>
       <Switch
         defaultSelected
-        color="success"
+        color="warning"
         isSelected={isSelected}
         onValueChange={(bool: boolean)=>{bool?setTheme('light'):setTheme('dark')
           setIsSelected(bool)}}

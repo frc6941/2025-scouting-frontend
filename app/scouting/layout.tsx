@@ -5,20 +5,22 @@ import {Tabs, Tab} from "@heroui/tabs";
 import {usePathname} from "next/navigation";
 
 export default function RootLayout({ children }) {
+  const pathname = usePathname()
+  console.log(pathname)
 
-  const pathname = usePathname();
+
   return (
-      <main className="pl-16 pt-4 w-full" suppressHydrationWarning>
-        <Tabs aria-label="Options" selectedKey={pathname} className="pt-1 pl-6">
-          <Tab key="basicInfo" title="basicInfo" href="/scouting/step1">
+      <main className="pl-16 pt-4 w-full"  suppressHydrationWarning>
+        <Tabs aria-label="Options" className="pt-1 pl-6" selectedKey={pathname} variant="bordered">
+          <Tab key="/scouting/step1" title="basicInfo" href="/scouting/step1">
           </Tab>
-          <Tab key="StartingPoint" title="StartingPoint" href="/scouting/step2">
+          <Tab key="/scouting/step2" title="StartingPoint" href="/scouting/step2">
           </Tab>
-          <Tab key="Autonomous" title="Autonomous" href="/scouting/step3">
+          <Tab key="/scouting/step3" title="Autonomous" href="/scouting/step3">
           </Tab>
-          <Tab key="Teleop" title="Teleop" href="/scouting/step4">
+          <Tab key="/scouting/step4" title="Teleop" href="/scouting/step4">
           </Tab>
-          <Tab key="End" title="End" href="/scouting/step5">
+          <Tab key="/scouting/step5" title="End" href="/scouting/step5">
           </Tab>
         </Tabs>
         <FormProvider>{children}</FormProvider>

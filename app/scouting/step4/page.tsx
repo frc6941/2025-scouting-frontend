@@ -19,10 +19,7 @@ export default function Step3() {
   function handleGoBack(){
     router.push("/scouting/step3");
   }
-// CounterButton component for reusability
 
-
-// Styled counter button with ripple effect and Material Design elevation
   const CounterButton = ({placement, onClick, icon: Icon, label }) => (
     <Tooltip content={label}
       classNames={{content:"text-default-600 bg-white dark:bg-black"}}

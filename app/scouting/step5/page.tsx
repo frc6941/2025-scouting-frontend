@@ -32,7 +32,7 @@ const Step5 = () => {
   }
 
   return (
-    <main className="container mx-auto px-4 py-8 ">
+    <main className="container mx-auto px-4 py-8 h-full">
       {/* Header */}
       <div className="text-center mb-8">
         <h1 className="text-3xl font-google-sans mb-1 font-extrabold">End Game</h1>
@@ -40,7 +40,7 @@ const Step5 = () => {
       </div>
 
       {/* Main Content */}
-      <Card className="p-6 backdrop-blur-md border-2 border-default-200 dark:border-default-100">
+      <Card className="p-6 backdrop-blur-md border-1 border-black dark:border-white h-full">
         <div className="grid md:grid-cols-2 gap-8">
           {/* Left Column */}
           <div className="space-y-6">
@@ -53,7 +53,9 @@ const Step5 = () => {
               placeholder="Select end game state"
               className="w-full"
               classNames={{
-                listbox: "bg-white dark:bg-black", // Add background to dropdown list
+                listbox: "bg-white dark:bg-black", // Add background to dropdown
+                trigger: "border-1 border-black",
+
               }}
             >
               {(state) => (
@@ -85,6 +87,7 @@ const Step5 = () => {
               minRows={24}
               classNames={{
                 input: "resize-y min-h-[300px]",
+                inputWrapper:"border-1 border-black dark:border-white"
               }}
             />
           </div>
