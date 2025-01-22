@@ -8,8 +8,8 @@ export default function RootLayout({ children }) {
 
   const pathname = usePathname();
   return (
-      <main className="pl-16 pt-4" suppressHydrationWarning>
-        <Tabs aria-label="Options" selectedKey={pathname}>
+      <main className="pl-16 pt-4 w-full" suppressHydrationWarning>
+        <Tabs aria-label="Options" selectedKey={pathname} className="pt-1 pl-6">
           <Tab key="basicInfo" title="basicInfo" href="/scouting/step1">
           </Tab>
           <Tab key="StartingPoint" title="StartingPoint" href="/scouting/step2">

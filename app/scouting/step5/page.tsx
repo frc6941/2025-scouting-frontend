@@ -52,11 +52,8 @@ const Step5 = () => {
               items={endGameStates}
               placeholder="Select end game state"
               className="w-full"
-              variant="bordered"
-              labelPlacement="outside"
               classNames={{
-                base: "max-w-full",
-                trigger: "h-12",
+                listbox: "bg-white dark:bg-black", // Add background to dropdown list
               }}
             >
               {(state) => (
@@ -100,7 +97,6 @@ const Step5 = () => {
           variant="flat"
           className="font-google-sans px-6 py-2"
           onPress={handleGoBack}
-          startContent={<span className="material-icons">arrow_back</span>}
         >
           Back
         </Button>
@@ -108,7 +104,6 @@ const Step5 = () => {
           color="primary"
           className="font-google-sans px-6 py-2"
           onPress={onSubmit}
-          endContent={<span className="material-icons">arrow_forward</span>}
         >
           Submit
         </Button>

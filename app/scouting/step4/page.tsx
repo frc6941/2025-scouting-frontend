@@ -25,11 +25,11 @@ export default function Step3() {
 // Styled counter button with ripple effect and Material Design elevation
   const CounterButton = ({placement, onClick, icon: Icon, label }) => (
     <Tooltip content={label}
-      classNames={{content:"text-default-600"}}
+      classNames={{content:"text-default-600 bg-white dark:bg-black"}}
       placement={placement}>
       <button
         onClick={onClick}
-        className="p-2 rounded-full hover:bg-gray-300  transition-all duration-200 active:bg-gray-300"
+        className="p-2 rounded-full hover:bg-gray-400  transition-all duration-200 active:bg-gray-400"
         aria-label={label}
       >
         <Icon className="text-default-600" />

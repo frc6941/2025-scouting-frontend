@@ -8,13 +8,13 @@ const FormContext = createContext();
 
 export const FormProvider = ({ children }) => {
   const [formData, setFormData] = useState({
-    matchType: "Qualification",
+    matchType: "",
     matchNumber: 0,
     alliance: "",
     team: 0,
-    scouter: "Evan",
+    scouter: "",
     endAndAfterGame: {
-      stopStatus: "Park",
+      stopStatus: "",
       comments: "",
     },
     teleop: {
