@@ -21,26 +21,28 @@ export default function Step1() {
   return (
     <main className="container mx-auto px-6 py-12 max-w-7xl min-h-screen">
       <div className="text-center mb-12">
-        <h1 className="text-5xl font-google-sans font-extrabold mb-3">
+        <h1 className="text-3xl font-google-sans font-extrabold mb-3">
           Match Information
         </h1>
-        <div className="h-2 w-24 bg-primary mx-auto rounded-full"/>
+        <div className="h-1 w-16 bg-primary mx-auto rounded-full"/>
       </div>
 
       <div className="grid md:grid-cols-2 gap-12">
         {/* Left Section */}
         <section className="space-y-8">
-          <Card className="p-8 backdrop-blur-md hover:shadow-xl transition-shadow duration-300 border-2 border-black dark:border-white">
+          <Card className="p-8 backdrop-blur-md hover:shadow-xl transition-shadow duration-300 border-1 border-black dark:border-white">
             <div className="space-y-8">
               <div>
-                <label className="text-xl text-default-600 block mb-3 font-google-sans font-extrabold">
+                <label className="text-xl text-default-600 block font-google-sans font-extrabold">
                   Match Type
                 </label>
                 <Input
                   size="lg"
-                  className="w-full backdrop-blur-sm text-lg py-6"
-                  placeholder="Enter match type"
+                  className="w-full backdrop-blur-sm text-lg "
+                  label="Enter match type"
                   value={formData.matchType}
+                  description="Enter match Type"
+                  variant="underlined"
                   onChange={(e) => setFormData({
                     ...formData,
                     matchType: e.target.value,
@@ -49,13 +51,15 @@ export default function Step1() {
               </div>
 
               <div>
-                <label className="text-xl text-default-600 block mb-3 font-google-sans font-extrabold">
+                <label className="text-xl text-default-600 block font-google-sans font-extrabold">
                   Scouter Initials
                 </label>
                 <Input
                   size="lg"
-                  className="w-full backdrop-blur-sm text-lg py-6"
-                  placeholder="Enter your initials"
+                  className="w-full backdrop-blur-sm text-lg "
+                  label="Enter your initials"
+                  variant="underlined"
+                  description="Enter Scouter Name"
                   value={formData.scouter}
                   onChange={(e) => setFormData({
                     ...formData,
@@ -69,17 +73,19 @@ export default function Step1() {
 
         {/* Right Section */}
         <section className="space-y-8">
-          <Card className="p-8 backdrop-blur-md hover:shadow-xl transition-shadow duration-300 border-2 border-black dark:border-white">
+          <Card className="p-8 backdrop-blur-md hover:shadow-xl transition-shadow duration-300 border-1 border-black dark:border-white">
             <div className="space-y-8">
-              <div className="grid grid-cols-2 gap-6">
+              <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xl text-default-600 block mb-3 font-google-sans font-extrabold">
+                  <label className="text-xl text-default-600 block  font-google-sans font-extrabold">
                     Match Number
                   </label>
                   <Input
                     size="lg"
-                    className="w-full backdrop-blur-sm text-lg py-6"
-                    placeholder="Enter match #"
+                    variant="underlined"
+                    className="w-full backdrop-blur-sm text-lg py-3"
+                    description="Enter match number"
+                    label="Enter match #"
                     value={formData.matchNumber}
                     onChange={(e) => setFormData({
                       ...formData,
@@ -88,13 +94,15 @@ export default function Step1() {
                   />
                 </div>
                 <div>
-                  <label className="text-xl text-default-600 block mb-3 font-google-sans font-extrabold">
+                  <label className="text-xl text-default-600 block  font-google-sans font-extrabold">
                     Team Number
                   </label>
                   <Input
                     size="lg"
-                    className="w-full backdrop-blur-sm text-lg py-6"
-                    placeholder="Enter team #"
+                    className="w-full backdrop-blur-sm text-lg py-3"
+                    description="team number"
+                    label="Enter team #"
+                    variant="underlined"
                     value={formData.team}
                     onChange={(e) => setFormData({
                       ...formData,

@@ -57,7 +57,7 @@ export default function Step3() {
   );
 
   const AlgaeCounter = ({label, value, onIncrement, onDecrement, icon: Icon }) => (
-    <Card className="w-full p-4 backdrop-blur-md hover:shadow-lg transition-shadow duration-200 border-1  border-black dark:border-white">
+    <Card  className="w-full p-4 backdrop-blur-md hover:shadow-lg transition-shadow duration-200 border-1  border-black dark:border-white">
       <div className="flex items-center justify-between gap-4">
         <CounterButton
           placement="right"

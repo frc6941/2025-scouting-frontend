@@ -31,7 +31,7 @@ export default function Sidebar() {
     <div className="relative suppressHydrationWarning">
       {/* Toggle button for both large and small screens */}
       <button
-        className="dark fixed top-4 left-4 z-50 p-2 rounded-md  focus:outline-none focus:ring-2 "
+        className="dark fixed top-4 left-4 z-50 p-2 rounded-md focus:outline-none focus:ring-2 "
         onClick={() => setIsOpen(!isOpen)}
       >
         <svg
@@ -75,7 +75,7 @@ export default function Sidebar() {
               <li key={index}>
                 <a
                   href={item.href}
-                  className={`flex items-center p-3 text-base rounded-lg hover:bg-gray-100 group  `}
+                  className={`flex items-center p-3 text-base rounded-lg hover:bg-black hover:text-white hover:dark:text-black hover:dark:bg-white group  `}
                 >
                   <span className="w-6 h-6 flex items-center justify-center text-lg">
                     {item.icon}

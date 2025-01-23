@@ -50,11 +50,13 @@ const Step5 = () => {
             </div>
             <Select
               items={endGameStates}
-              placeholder="Select end game state"
               className="w-full"
+              variant="underlined"
+              description="end game position"
+              label="select end game state"
               classNames={{
                 listbox: "bg-white dark:bg-black", // Add background to dropdown
-                trigger: "border-1 border-black",
+                trigger: "",
 
               }}
             >
@@ -71,8 +73,9 @@ const Step5 = () => {
               <h2 className="text-xl font-google-sans">Additional Notes</h2>
             </div>
             <Textarea
-              variant="bordered"
-              placeholder="Add any additional observations..."
+              variant="underlined"
+              description="Add any additional observations..."
+              label="Comments"
               value={formData.endAndAfterGame.comments}
               onChange={(e) => {
                 setFormData({
@@ -86,8 +89,7 @@ const Step5 = () => {
               className="w-full"
               minRows={24}
               classNames={{
-                input: "resize-y min-h-[300px]",
-                inputWrapper:"border-1 border-black dark:border-white"
+                input: "resize-y ",
               }}
             />
           </div>
