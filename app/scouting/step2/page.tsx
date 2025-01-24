@@ -26,6 +26,7 @@ export default function Step2() {
         value={formData.email}
         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
       />
+
       <button onClick={handleNext}>Next</button>
       <button onClick={handleGoBack}>Go Back</button>
     </div>

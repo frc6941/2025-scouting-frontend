@@ -32,7 +32,7 @@ export const FormProvider = ({ children }) => {
       },
     },
     autonomous: {
-      autoStart: "A",
+      autoStart: "",
       coralCount: {
         l4: 0,
         l3: 0,
