@@ -193,15 +193,17 @@ export default function Step3() {
       <div className="flex justify-between mt-12 px-4">
         <Button
           variant="flat"
-          className="font-google-sans px-8"
+          className="font-google-sans px-12"
+          size="lg"
           onPress={handleGoBack}
         >
           Back
         </Button>
         <Button
           color="primary"
-          className="font-google-sans px-8"
+          className="font-google-sans px-12 py-6"
           onPress={handleNext}
+          size="lg"
         >
           Next
         </Button>

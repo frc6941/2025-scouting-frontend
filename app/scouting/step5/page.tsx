@@ -1,19 +1,18 @@
 'use client'
 
-import React from 'react';
+import React, {useState} from 'react';
 import { Textarea, Button, Select, SelectItem, Card } from "@heroui/react";
 import { useForm } from "@/app/scouting/contexts/FormContent";
 import { useRouter } from "next/navigation";
 import { Description as DescriptionIcon, Flag as FlagIcon } from "@mui/icons-material";
+import {AlertSuccess} from "@/components/SubmitSuccessAlert";
 
 const Step5 = () => {
   // @ts-ignore
   const { formData, setFormData } = useForm();
+  const [alert, setAlert] = useState(false)
   const router = useRouter();
 
-  const handleNext = () => {
-    router.push("/scouting/step5");
-  };
 
   const handleGoBack = () => {
     router.push("/scouting/step4");
@@ -28,11 +27,17 @@ const Step5 = () => {
   ];
 
   function onSubmit() {
+    setAlert(true)
     console.log(formData);
+    setTimeout(() => {
+      setAlert(false);
+      router.push("/")
+    }, 1500);
   }
 
   return (
     <main className="container mx-auto px-4 py-8 h-full">
+      {alert&&<AlertSuccess className="mb-8"></AlertSuccess>}
       {/* Header */}
       <div className="text-center mb-8">
         <h1 className="text-3xl font-google-sans mb-1 font-extrabold">End Game</h1>
@@ -40,7 +45,7 @@ const Step5 = () => {
       </div>
 
       {/* Main Content */}
-      <Card className="p-6 backdrop-blur-md border-1 border-black dark:border-white h-full">
+      <Card className="p-6 backdrop-blur-md border-1 border-primary dark:border-white h-full">
         <div className="grid md:grid-cols-2 gap-8">
           {/* Left Column */}
           <div className="space-y-6">
@@ -97,17 +102,20 @@ const Step5 = () => {
       </Card>
 
       {/* Navigation Buttons */}
-      <div className="flex justify-between mt-8">
+      <div className="flex justify-between mt-12 px-4">
         <Button
           variant="flat"
-          className="font-google-sans px-6 py-2"
+          className="font-google-sans px-12"
+          size="lg"
           onPress={handleGoBack}
         >
           Back
         </Button>
         <Button
           color="primary"
-          className="font-google-sans px-6 py-2"
+          className="font-google-sans px-12 py-6"
+          size="lg"
+          type="submit"
           onPress={onSubmit}
         >
           Submit
@@ -117,4 +125,4 @@ const Step5 = () => {
   );
 };
 
-export default Step5;
+export default Step5
