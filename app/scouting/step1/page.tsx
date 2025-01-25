@@ -29,8 +29,8 @@ export default function Step1() {
 
       <div className="grid md:grid-cols-2 gap-12">
         {/* Left Section */}
-        <section className="space-y-8">
-          <Card className="p-8 backdrop-blur-md hover:shadow-xl transition-shadow duration-300 border-1 border-black dark:border-white">
+        <section className="space-y-8 h-full">
+          <Card className="p-8 h-full backdrop-blur-md hover:shadow-xl transition-shadow duration-300 border-1 border-black dark:border-white">
             <div className="space-y-8">
               <div>
                 <label className="text-xl text-default-600 block font-google-sans font-extrabold">
