@@ -1,18 +1,17 @@
 'use client'
 
-import React, {useState} from 'react';
+import React from 'react';
 import { Textarea, Button, Select, SelectItem, Card } from "@heroui/react";
 import { useForm } from "@/app/scouting/contexts/FormContent";
 import { useRouter } from "next/navigation";
 import { Description as DescriptionIcon, Flag as FlagIcon } from "@mui/icons-material";
-import {AlertSuccess} from "@/components/SubmitSuccessAlert";
+import { useToast } from "@/hooks/use-toast";
 
 const Step5 = () => {
   // @ts-ignore
   const { formData, setFormData } = useForm();
-  const [alert, setAlert] = useState(false)
   const router = useRouter();
-
+  const { toast } = useToast();
 
   const handleGoBack = () => {
     router.push("/scouting/step4");
@@ -26,18 +25,32 @@ const Step5 = () => {
     { key: "playedDefense", label: "Played Defense" },
   ];
 
-  function onSubmit() {
-    setAlert(true)
-    console.log(formData);
-    setTimeout(() => {
-      setAlert(false);
-      router.push("/")
-    }, 1500);
+  async function onSubmit() {
+    try {
+      // Here you would typically submit your data to an API
+      // const response = await submitData(formData);
+      
+      toast({
+        title: "Success!",
+        description: "Form submitted successfully",
+        // If you have a response message, you can use it here
+        // description: response.message || "Form submitted successfully",
+      });
+
+      setTimeout(() => {
+        router.push("/");
+      }, 1500);
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message || "Something went wrong",
+      });
+    }
   }
 
   return (
     <main className="container mx-auto px-4 py-8 h-full">
-      {alert&&<AlertSuccess className="mb-8"></AlertSuccess>}
       {/* Header */}
       <div className="text-center mb-8">
         <h1 className="text-3xl font-google-sans mb-1 font-extrabold">End Game</h1>
@@ -60,9 +73,8 @@ const Step5 = () => {
               description="end game position"
               label="select end game state"
               classNames={{
-                listbox: "bg-white dark:bg-black", // Add background to dropdown
+                listbox: "bg-white dark:bg-black",
                 trigger: "",
-
               }}
             >
               {(state) => (
@@ -94,7 +106,7 @@ const Step5 = () => {
               className="w-full"
               minRows={24}
               classNames={{
-                input: "resize-y ",
+                input: "resize-y",
               }}
             />
           </div>
@@ -125,4 +137,4 @@ const Step5 = () => {
   );
 };
 
-export default Step5
+export default Step5;

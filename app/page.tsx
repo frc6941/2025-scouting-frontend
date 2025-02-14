@@ -7,7 +7,6 @@ export default function Home() {
     <div className="flex flex-col justify-between pl-16 pt-10" suppressHydrationWarning>
       <div className="justify-center pr-36 flex"><p className="font-extrabold text-6xl">Main Page</p></div>
       <div className="absolute right-8 top-[23px]">
-        <ThemeSwitcher></ThemeSwitcher>
       </div>
     </div>
   );

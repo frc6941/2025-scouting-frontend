@@ -11,7 +11,7 @@ export default function RootLayout({ children }) {
 
 
   return (
-      <main className="pl-16 pt-4 w-full"  suppressHydrationWarning>
+      <main className=" pt-4 w-full"  suppressHydrationWarning>
         <div className="hidden md:block pt-1 pl-6">
           <Tabs
             selectedKey={pathname}

@@ -19,6 +19,59 @@ export default function Step3() {
   function handleGoBack(){
     router.push("/scouting/step2");
   }
+
+  const handleCoralIncrement = (level: string) => {
+    setFormData(prev => ({
+      ...prev,
+      autonomous: {
+        ...prev.autonomous,
+        coralCount: {
+          ...prev.autonomous.coralCount,
+          [level.toLowerCase()]: prev.autonomous.coralCount[level.toLowerCase()] + 1
+        }
+      }
+    }));
+  };
+
+  const handleCoralDecrement = (level: string) => {
+    setFormData(prev => ({
+      ...prev,
+      autonomous: {
+        ...prev.autonomous,
+        coralCount: {
+          ...prev.autonomous.coralCount,
+          [level.toLowerCase()]: Math.max(0, prev.autonomous.coralCount[level.toLowerCase()] - 1)
+        }
+      }
+    }));
+  };
+
+  const handleAlgaeIncrement = (key: string) => {
+    setFormData(prev => ({
+      ...prev,
+      autonomous: {
+        ...prev.autonomous,
+        algaeCount: {
+          ...prev.autonomous.algaeCount,
+          [key]: prev.autonomous.algaeCount[key] + 1
+        }
+      }
+    }));
+  };
+
+  const handleAlgaeDecrement = (key: string) => {
+    setFormData(prev => ({
+      ...prev,
+      autonomous: {
+        ...prev.autonomous,
+        algaeCount: {
+          ...prev.autonomous.algaeCount,
+          [key]: Math.max(0, prev.autonomous.algaeCount[key] - 1)
+        }
+      }
+    }));
+  };
+
   const CounterButton = ({placement, onClick, icon: Icon, label }) => (
     <Tooltip content={label}
              classNames={{content:"text-default-600 bg-white dark:bg-black"}}
@@ -99,51 +152,15 @@ export default function Step3() {
                 key={level}
                 label={level}
                 value={formData.autonomous.coralCount[level.toLowerCase()]}
-                onIncrement={() => setFormData(prev => ({
-                  ...prev,
-                  autonomous: {
-                    ...prev.autonomous,
-                    coralCount: {
-                      ...prev.autonomous.coralCount,
-                      [level.toLowerCase()]: prev.autonomous.coralCount[level.toLowerCase()] + 1
-                    }
-                  }
-                }))}
-                onDecrement={() => setFormData(prev => ({
-                  ...prev,
-                  autonomous: {
-                    ...prev.autonomous,
-                    coralCount: {
-                      ...prev.autonomous.coralCount,
-                      [level.toLowerCase()]: prev.autonomous.coralCount[level.toLowerCase()] - 1
-                    }
-                  }
-                }))}
+                onIncrement={() => handleCoralIncrement(level)}
+                onDecrement={() => handleCoralDecrement(level)}
               />
             ))}
             <Counter
               label="Miss"
               value={formData.autonomous.coralCount.dropOrMiss}
-              onIncrement={() => setFormData(prev => ({
-                ...prev,
-                autonomous: {
-                  ...prev.autonomous,
-                  coralCount: {
-                    ...prev.autonomous.coralCount,
-                    dropOrMiss: prev.autonomous.coralCount.dropOrMiss + 1
-                  }
-                }
-              }))}
-              onDecrement={() => setFormData(prev => ({
-                ...prev,
-                autonomous: {
-                  ...prev.autonomous,
-                  coralCount: {
-                    ...prev.autonomous.coralCount,
-                    dropOrMiss: prev.autonomous.coralCount.dropOrMiss - 1
-                  }
-                }
-              }))}
+              onIncrement={() => handleCoralIncrement('dropOrMiss')}
+              onDecrement={() => handleCoralDecrement('dropOrMiss')}
             />
           </div>
         </section>
@@ -162,26 +179,8 @@ export default function Step3() {
                 label={label}
                 value={formData.autonomous.algaeCount[key]}
                 icon={Icon}
-                onIncrement={() => setFormData(prev => ({
-                  ...prev,
-                  autonomous: {
-                    ...prev.autonomous,
-                    algaeCount: {
-                      ...prev.autonomous.algaeCount,
-                      [key]: prev.autonomous.algaeCount[key] + 1
-                    }
-                  }
-                }))}
-                onDecrement={() => setFormData(prev => ({
-                  ...prev,
-                  autonomous: {
-                    ...prev.autonomous,
-                    algaeCount: {
-                      ...prev.autonomous.algaeCount,
-                      [key]: prev.autonomous.algaeCount[key] - 1
-                    }
-                  }
-                }))}
+                onIncrement={() => handleAlgaeIncrement(key)}
+                onDecrement={() => handleAlgaeDecrement(key)}
               />
             ))}
           </div>

@@ -7,7 +7,7 @@ import {Ban, Minus, PersonStanding, Plus, ShoppingBasket} from "lucide-react"
 import { Card, Button, Tooltip } from "@heroui/react";
 import { Add as AddIcon, Remove as RemoveIcon } from "@mui/icons-material";
 
-export default function Step3() {
+export default function Step4() {
   // @ts-ignore
   const { formData, setFormData } = useForm();
   const router = useRouter();
@@ -19,6 +19,58 @@ export default function Step3() {
   function handleGoBack(){
     router.push("/scouting/step3");
   }
+
+  const handleCoralIncrement = (level: string) => {
+    setFormData(prev => ({
+      ...prev,
+      teleop: {
+        ...prev.teleop,
+        coralCount: {
+          ...prev.teleop.coralCount,
+          [level.toLowerCase()]: prev.teleop.coralCount[level.toLowerCase()] + 1
+        }
+      }
+    }));
+  };
+
+  const handleCoralDecrement = (level: string) => {
+    setFormData(prev => ({
+      ...prev,
+      teleop: {
+        ...prev.teleop,
+        coralCount: {
+          ...prev.teleop.coralCount,
+          [level.toLowerCase()]: Math.max(0, prev.teleop.coralCount[level.toLowerCase()] - 1)
+        }
+      }
+    }));
+  };
+
+  const handleAlgaeIncrement = (key: string) => {
+    setFormData(prev => ({
+      ...prev,
+      teleop: {
+        ...prev.teleop,
+        algaeCount: {
+          ...prev.teleop.algaeCount,
+          [key]: prev.teleop.algaeCount[key] + 1
+        }
+      }
+    }));
+  };
+
+  const handleAlgaeDecrement = (key: string) => {
+    setFormData(prev => ({
+      ...prev,
+      teleop: {
+        ...prev.teleop,
+        algaeCount: {
+          ...prev.teleop.algaeCount,
+          [key]: Math.max(0, prev.teleop.algaeCount[key] - 1)
+        }
+      }
+    }));
+  };
 
   const CounterButton = ({placement, onClick, icon: Icon, label }) => (
     <Tooltip content={label}
@@ -100,51 +152,15 @@ export default function Step3() {
                 key={level}
                 label={level}
                 value={formData.teleop.coralCount[level.toLowerCase()]}
-                onIncrement={() => setFormData(prev => ({
-                  ...prev,
-                  teleop: {
-                    ...prev.teleop,
-                    coralCount: {
-                      ...prev.teleop.coralCount,
-                      [level.toLowerCase()]: prev.teleop.coralCount[level.toLowerCase()] + 1
-                    }
-                  }
-                }))}
-                onDecrement={() => setFormData(prev => ({
-                  ...prev,
-                  teleop: {
-                    ...prev.teleop,
-                    coralCount: {
-                      ...prev.teleop.coralCount,
-                      [level.toLowerCase()]: prev.teleop.coralCount[level.toLowerCase()] - 1
-                    }
-                  }
-                }))}
+                onIncrement={() => handleCoralIncrement(level)}
+                onDecrement={() => handleCoralDecrement(level)}
               />
             ))}
             <Counter
               label="Miss"
               value={formData.teleop.coralCount.dropOrMiss}
-              onIncrement={() => setFormData(prev => ({
-                ...prev,
-                teleop: {
-                  ...prev.teleop,
-                  coralCount: {
-                    ...prev.teleop.coralCount,
-                    dropOrMiss: prev.teleop.coralCount.dropOrMiss + 1
-                  }
-                }
-              }))}
-              onDecrement={() => setFormData(prev => ({
-                ...prev,
-                teleop: {
-                  ...prev.teleop,
-                  coralCount: {
-                    ...prev.teleop.coralCount,
-                    dropOrMiss: prev.teleop.coralCount.dropOrMiss - 1
-                  }
-                }
-              }))}
+              onIncrement={() => handleCoralIncrement('dropOrMiss')}
+              onDecrement={() => handleCoralDecrement('dropOrMiss')}
             />
           </div>
         </section>
@@ -163,26 +179,8 @@ export default function Step3() {
                 label={label}
                 value={formData.teleop.algaeCount[key]}
                 icon={Icon}
-                onIncrement={() => setFormData(prev => ({
-                  ...prev,
-                  teleop: {
-                    ...prev.teleop,
-                    algaeCount: {
-                      ...prev.teleop.algaeCount,
-                      [key]: prev.teleop.algaeCount[key] + 1
-                    }
-                  }
-                }))}
-                onDecrement={() => setFormData(prev => ({
-                  ...prev,
-                  teleop: {
-                    ...prev.teleop,
-                    algaeCount: {
-                      ...prev.teleop.algaeCount,
-                      [key]: prev.teleop.algaeCount[key] - 1
-                    }
-                  }
-                }))}
+                onIncrement={() => handleAlgaeIncrement(key)}
+                onDecrement={() => handleAlgaeDecrement(key)}
               />
             ))}
           </div>
