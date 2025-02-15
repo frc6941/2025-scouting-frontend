@@ -6,6 +6,7 @@ import { useForm } from "@/app/scouting/contexts/FormContent";
 import { useRouter } from "next/navigation";
 import { Description as DescriptionIcon, Flag as FlagIcon } from "@mui/icons-material";
 import { useToast } from "@/hooks/use-toast";
+import { getCookie } from 'cookies-next/client';
 
 const Step5 = () => {
   // @ts-ignore
@@ -18,33 +19,45 @@ const Step5 = () => {
   };
 
   const endGameStates = [
-    { key: "park", label: "Park" },
-    { key: "deepClimb", label: "Deep Climb" },
-    { key: "shallowClimb", label: "Shallow Climb" },
-    { key: "failed", label: "Failed" },
-    { key: "playedDefense", label: "Played Defense" },
+    { key: "PARK", label: "Park" },
+    { key: "DEEP", label: "Deep Climb" },
+    { key: "SHALLOW", label: "Shallow Climb" },
+    { key: "FAILED", label: "Failed" },
+    { key: "PLAYED_DEFENSE", label: "Played Defense" },
   ];
 
   async function onSubmit() {
+    console.log(formData);
     try {
-      // Here you would typically submit your data to an API
-      // const response = await submitData(formData);
-      
-      toast({
-        title: "Success!",
-        description: "Form submitted successfully",
-        // If you have a response message, you can use it here
-        // description: response.message || "Form submitted successfully",
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/scouting/record`, {
+        method: "POST",
+        headers: {"Authorization": `Bearer ${getCookie("Authorization")}`},
+        body: JSON.stringify(formData),
       });
+      const data = await response.json();
+      console.log(data);
+      if (!(data.message)) {
+        toast({
+          title: "Success!",
+          description: "Form submitted successfully",
+        });
+        setTimeout(() => {
+          router.push("/");
+        }, 1500);
+      }
+      else {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: data.message,
+        });
+      }
 
-      setTimeout(() => {
-        router.push("/");
-      }, 1500);
     } catch (error) {
       toast({
         variant: "destructive",
         title: "Error",
-        description: error.message || "Something went wrong",
+        description: error.message || "Something went wrong, contact the admin",
       });
     }
   }
@@ -61,17 +74,28 @@ const Step5 = () => {
       <Card className="p-6 backdrop-blur-md border-1 border-primary dark:border-white h-full">
         <div className="grid md:grid-cols-2 gap-8">
           {/* Left Column */}
-          <div className="space-y-6">
-            <div className="flex items-center gap-2 mb-2">
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
               <FlagIcon className="text-default-600" />
               <h2 className="text-xl font-google-sans">Final Position</h2>
             </div>
             <Select
               items={endGameStates}
+              label="select end game state"
               className="w-full"
               variant="underlined"
               description="end game position"
-              label="select end game state"
+              selectedKeys={formData.endAndAfterGame.endGameState}
+              onSelectionChange={(e) => {
+                console.log(e.currentKey)
+                setFormData({
+                  ...formData,
+                  endAndAfterGame: {
+                    ...formData.endAndAfterGame,
+                    stopStatus: e.currentKey
+                  }
+                });
+              }}
               classNames={{
                 listbox: "bg-white dark:bg-black",
                 trigger: "",

@@ -44,7 +44,7 @@ export const SunIcon = (props) => {
 export function ThemeSwitcher() {
   const [mounted, setMounted] = useState(false)
   const { theme, setTheme } = useTheme()
-  const [isSelected, setIsSelected] = useState(true)
+  const [isSelected, setIsSelected] = useState(false)
 
   useEffect(() => {
     setMounted(true)

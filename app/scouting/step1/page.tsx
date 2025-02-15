@@ -4,18 +4,91 @@ import { useForm } from "@/app/scouting/contexts/FormContent";
 import { useRouter } from "next/navigation";
 import { Input } from "@heroui/input";
 import { Button, Card } from "@heroui/react";
+import { toast } from "@/hooks/use-toast";
+import { Select, SelectItem } from "@heroui/react";
 
 export default function Step1() {
   // @ts-ignore
   const { formData, setFormData } = useForm();
   const router = useRouter();
 
+  const validateForm = (formData: any) => {
+    const errors = [];
+
+    // Match Type Validation
+    const validMatchTypes = ["Qualification", "Practice", "Match", "Final"];
+    if (!validMatchTypes.includes(formData.matchType)) {
+      errors.push("Match type must be Qualification, Practice, Match, or Final");
+    }
+
+    // Match Number Validation
+    if (!Number.isInteger(Number(formData.matchNumber))) {
+      errors.push("Match number must be a whole number");
+    }
+    if (Number(formData.matchNumber) < 0) {
+      errors.push("Match number cannot be negative");
+    }
+
+    // Alliance Validation
+    const validAlliances = ["Red", "Blue"];
+    if (!validAlliances.includes(formData.alliance)) {
+      errors.push("Alliance must be either Red or Blue");
+    }
+
+    // Team Number Validation
+    if (!Number.isInteger(Number(formData.team))) {
+      errors.push("Team number must be a whole number");
+    }
+    if (Number(formData.team) < 1) {
+      errors.push("Team number must be greater than 0");
+    }
+
+    // Required Objects Validation
+    if (!formData.autonomous) {
+      errors.push("Autonomous data is required");
+    }
+    if (!formData.teleop) {
+      errors.push("Teleop data is required");
+    }
+    if (!formData.endAndAfterGame) {
+      errors.push("End game data is required");
+    }
+
+    return errors;
+  };
+
   const handleNext = () => {
+    const errors = validateForm(formData);
+    
+    if (errors.length > 0) {
+      toast({
+        variant: "destructive",
+        title: "Validation Error",
+        description: (
+          <ul className="list-disc pl-4">
+            {errors.map((error, index) => (
+              <li key={index}>{error}</li>
+            ))}
+          </ul>
+        ),
+      });
+      return;
+    }
+
     router.push("/scouting/step2");
   };
 
   const handleGoBack = () => {
     router.push("/");
+  };
+
+  const handleInputChange = (field: string, value: any) => {
+    setFormData({
+      ...formData,
+      [field]: field === 'matchNumber' || field === 'team' 
+        ? Number(value) 
+        : value.currentKey || value,
+    });
   };
 
   return (
@@ -33,21 +106,20 @@ export default function Step1() {
           <Card className="p-8 h-full backdrop-blur-md hover:shadow-xl transition-shadow duration-300 border-1 border-black dark:border-white">
             <div className="space-y-8">
               <div>
-                <label className="text-xl text-default-600 block font-google-sans font-extrabold">
+                <label className="text-xl text-default-600 block font-google-sans font-extrabold pb-2">
                   Match Type
                 </label>
-                <Input
-                  size="lg"
-                  className="w-full backdrop-blur-sm text-lg "
-                  label="Enter match type"
-                  value={formData.matchType}
-                  description="Enter match Type"
-                  variant="underlined"
-                  onChange={(e) => setFormData({
-                    ...formData,
-                    matchType: e.target.value,
-                  })}
-                />
+                <Select
+                  label="Match Type"
+                  selectedKeys={new Set([formData.matchType])}
+                  onSelectionChange={(keys) => handleInputChange('matchType', keys)}
+                  required
+                >
+                  <SelectItem key="QUAL">Qualification</SelectItem>
+                  <SelectItem key="PRAC">Practice</SelectItem>
+                  <SelectItem key="MATCH">Match</SelectItem>
+                  <SelectItem key="FIANL">Final</SelectItem>
+                </Select>
               </div>
 
               <div>
@@ -72,76 +144,66 @@ export default function Step1() {
         </section>
 
         {/* Right Section */}
-        <section className="space-y-8">
-          <Card className="p-8 backdrop-blur-md hover:shadow-xl transition-shadow duration-300 border-1 border-black dark:border-white">
+        <section className="space-y-8 h-full">
+          <Card className="h-full p-8 backdrop-blur-md hover:shadow-xl transition-shadow duration-300 border-1 border-black dark:border-white">
             <div className="space-y-8">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xl text-default-600 block  font-google-sans font-extrabold">
+                  <label className="text-xl text-default-600 block  font-google-sans font-extrabold pb-2">
                     Match Number
                   </label>
                   <Input
-                    size="lg"
-                    variant="underlined"
-                    className="w-full backdrop-blur-sm text-lg py-3"
-                    description="Enter match number"
-                    label="Enter match #"
-                    value={formData.matchNumber}
-                    onChange={(e) => setFormData({
-                      ...formData,
-                      matchNumber: e.target.value,
-                    })}
+                    type="number"
+                    label="Match Number"
+                    placeholder="Enter match number"
+                    value={formData.matchNumber || ''}
+                    onChange={(e) => handleInputChange('matchNumber', e.target.value)}
+                    min={0}
+                    required
                   />
                 </div>
                 <div>
-                  <label className="text-xl text-default-600 block  font-google-sans font-extrabold">
+                  <label className="text-xl text-default-600 block  font-google-sans font-extrabold pb-2">
                     Team Number
                   </label>
                   <Input
-                    size="lg"
-                    className="w-full backdrop-blur-sm text-lg py-3"
-                    description="team number"
-                    label="Enter team #"
-                    variant="underlined"
-                    value={formData.team}
-                    onChange={(e) => setFormData({
-                      ...formData,
-                      team: e.target.value,
-                    })}
+                    type="number"
+                    label="Team Number"
+                    placeholder="Enter team number"
+                    value={formData.team || ''}
+                    onChange={(e) => handleInputChange('team', e.target.value)}
+                    min={1}
+                    required
                   />
                 </div>
               </div>
-
-              <div>
-                <label className="text-xl text-default-600 block mb-3 font-google-sans font-extrabold">
-                  Select Alliance
-                </label>
-                <div className="flex gap-6">
-                  <button
-                    className={`
-                      flex-1 px-6 py-5 rounded-lg font-google-sans text-xl
-                      transition-all duration-300 transform hover:scale-105
-                      ${formData.alliance === 'red'
+              <div className="flex gap-6">
+                <button
+                  type="button"
+                  className={`
+                    flex-1 px-8 py-8 rounded-lg font-google-sans text-2xl font-semibold
+                    transition-all duration-300 transform hover:scale-105
+                    ${formData.alliance === 'Red'
                       ? 'bg-red-500 text-white shadow-lg'
-                      : 'hover:bg-red-100 border-2 border-red-500'}
-                    `}
-                    onClick={() => setFormData({...formData, alliance: 'red'})}
-                  >
-                    Red Alliance
-                  </button>
-                  <button
-                    className={`
-                      flex-1 px-6 py-5 rounded-lg font-google-sans text-xl
-                      transition-all duration-300 transform hover:scale-105
-                      ${formData.alliance === 'blue'
+                      : 'border-3 border-red-500 text-white bg-transparent hover:bg-red-500 hover:text-white'}
+                  `}
+                  onClick={() => setFormData({...formData, alliance: 'Red'})}
+                >
+                  Red Alliance
+                </button>
+                <button
+                  type="button"
+                  className={`
+                    flex-1 px-8 py-8 rounded-lg font-google-sans text-2xl font-semibold
+                    transition-all duration-300 transform hover:scale-105
+                    ${formData.alliance === 'Blue'
                       ? 'bg-blue-500 text-white shadow-lg'
-                      : 'hover:bg-blue-100 border-2 border-blue-500'}
-                    `}
-                    onClick={() => setFormData({...formData, alliance: 'blue'})}
-                  >
-                    Blue Alliance
-                  </button>
-                </div>
+                      : 'border-3 border-blue-500  bg-transparent hover:bg-blue-500 hover:text-white'}
+                  `}
+                  onClick={() => setFormData({...formData, alliance: 'Blue'})}
+                >
+                  Blue Alliance
+                </button>
               </div>
             </div>
           </Card>

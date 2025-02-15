@@ -10,28 +10,21 @@ export default function PitScouting() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Handle file selection or capture
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files) return;
 
     // Convert FileList to Array and process each file
     const fileArray = Array.from(files);
     
-    // Process all files concurrently
-    const newPhotos = await Promise.all(
-      fileArray.map(file => {
-        return new Promise<string>((resolve) => {
-          const reader = new FileReader();
-          reader.onloadend = () => {
-            resolve(reader.result as string);
-          };
-          reader.readAsDataURL(file);
-        });
-      })
-    );
-
-    // Add new photos to existing ones
-    setPhotos(prev => [...prev, ...newPhotos]);
+    // Process each file
+    fileArray.forEach(file => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPhotos(prev => [...prev, reader.result as string]);
+      };
+      reader.readAsDataURL(file);
+    });
 
     // Reset the input so the same file can be selected again
     if (fileInputRef.current) {
@@ -83,7 +76,7 @@ export default function PitScouting() {
                     <Checkbox id="amp" />
                     <label
                       htmlFor="amp"
-                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      className="text-sm font-medium leading-none"
                     >
                       能放 Amp
                     </label>
@@ -92,7 +85,7 @@ export default function PitScouting() {
                     <Checkbox id="speaker" />
                     <label
                       htmlFor="speaker"
-                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      className="text-sm font-medium leading-none"
                     >
                       能投 Speaker
                     </label>
@@ -101,7 +94,7 @@ export default function PitScouting() {
                     <Checkbox id="trap" />
                     <label
                       htmlFor="trap"
-                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      className="text-sm font-medium leading-none"
                     >
                       能放 Trap
                     </label>

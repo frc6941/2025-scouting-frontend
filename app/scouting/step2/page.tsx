@@ -11,6 +11,7 @@ export default function GameLayout() {
   const { formData, setFormData } = useForm();
 
   const handleButtonClick = (buttonId) => {
+    console.log(buttonId)
     setFormData({
       ...formData,
       autonomous: {

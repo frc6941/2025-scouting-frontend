@@ -1,11 +1,17 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from 'next/navigation';
 import { ChartNoAxesGantt, Binoculars, BookUser, Home, Settings, Menu, X } from "lucide-react";
 import { ThemeSwitcher } from "./ThemeSwitcher";
+import {jwtDecode} from "jwt-decode";
+import Image from "next/image";
 
+import { getCookie, hasCookie } from "cookies-next/client";
+
+
+//sub in with the ironpulse logo
 const Logo = () => (
   <svg fill="none" height="36" viewBox="0 0 32 32" width="36" className="text-primary">
     <path
@@ -17,9 +23,22 @@ const Logo = () => (
   </svg>
 );
 
+export type JwtPayload = {
+  name: string;
+  sub: string;
+  avatarUrl: string;
+  roles: Role[];
+};
+
+export enum Role {
+  USER = 'user',
+  ADMIN = 'admin',
+}
+
 export default function NavBar() {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const pathname = usePathname();
+  const isLoggedIn = hasCookie("Authorization")
 
   const menuItems = [
     { name: "Home", href: "/", icon: <Home className="w-5 h-5" /> },
@@ -27,6 +46,22 @@ export default function NavBar() {
     { name: "Scouting", href: "/scouting/step1", icon: <Binoculars className="w-5 h-5" /> },
     { name: "Settings", href: "/settings", icon: <Settings className="w-5 h-5" /> },
   ];
+
+  function setUserInfo(payload: JwtPayload) {
+    throw new Error("Function not implemented.");
+  }
+  
+
+  // useEffect(() => {
+  //   if (!isLoggedIn && window.location.pathname !== '/auth/feishu') {
+  //     window.location.assign("https://accounts.feishu.cn/open-apis/authen/v1/authorize?client_id=cli_a71a0cebd21a900d&redirect_uri=http://localhost:3000/auth/feishu");
+  //   }
+  //   if (isLoggedIn && window.location.pathname !== '/auth/feishu') {
+  //     const token = getCookie("Authorization");
+  //     const payload = jwtDecode<JwtPayload>(token!);
+  //     setUserInfo(payload);
+  //   }
+  // }, [isLoggedIn]);
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 
@@ -78,9 +113,15 @@ export default function NavBar() {
           </div>
         </div>
 
-        {/* Theme Switcher */}
-        <div className="flex items-center">
-          <ThemeSwitcher />
+        {/* Theme Switcher and Avatar */}
+        <div className="flex justify-end gap-4">
+          <div className="sm:flex hidden items-center">
+            <ThemeSwitcher />
+          </div>
+
+          <div className="flex items-center">
+            <Image src="/example.jpg" alt="IronPulse" width={45} height={45} className="rounded-full" />
+          </div>
         </div>
 
         {/* Mobile Menu */}
@@ -114,3 +155,4 @@ export default function NavBar() {
     </nav>
   );
 } 
+
