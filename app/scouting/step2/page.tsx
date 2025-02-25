@@ -16,7 +16,7 @@ export default function GameLayout() {
       ...formData,
       autonomous: {
         ...formData.autonomous,
-        autoStart: `${buttonId}`
+        autoStart: parseInt(`${buttonId}`)
       }
     });
   };
@@ -108,7 +108,7 @@ export default function GameLayout() {
         </section>
       </div>
 
-      <div className="flex justify-between mt-16 px-6">
+      <div className="flex justify-between mt-16 ">
         <Button
           variant="flat"
           size="lg"

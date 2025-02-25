@@ -21,7 +21,8 @@ export default function FeishuAuthPage() {
         }
       );
       const token: Response = await data.json();
-      setCookie("Authorization", `Bearer ${token.accessToken}`);
+      setCookie("Authorization", token.accessToken);
+      console.log(token.accessToken);
       await new Promise(resolve => setTimeout(resolve, 300));
       window.location.href = "/";
     }

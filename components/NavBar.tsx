@@ -38,30 +38,38 @@ export enum Role {
 export default function NavBar() {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const pathname = usePathname();
-  const isLoggedIn = hasCookie("Authorization")
+  const isLoggedIn = hasCookie("Authorization");
+  const [userInfo, setUserInfo] = React.useState<JwtPayload | null>(null);
 
   const menuItems = [
     { name: "Home", href: "/", icon: <Home className="w-5 h-5" /> },
     { name: "Pit Scouting", href: "/pit-scouting", icon: <BookUser className="w-5 h-5" /> },
     { name: "Scouting", href: "/scouting/step1", icon: <Binoculars className="w-5 h-5" /> },
-    { name: "Settings", href: "/settings", icon: <Settings className="w-5 h-5" /> },
+    { name: "DashBoard", href: "/dashboard", icon: <Settings className="w-5 h-5" /> },
   ];
 
-  function setUserInfo(payload: JwtPayload) {
-    throw new Error("Function not implemented.");
-  }
-  
+  useEffect(() => {
+    // Redirect to login if not logged in
+    if (!isLoggedIn && window.location.pathname !== '/auth/feishu') {
+      window.location.assign("https://accounts.feishu.cn/open-apis/authen/v1/authorize?client_id=cli_a71a0cebd21a900d&redirect_uri=http://localhost:3000/auth/feishu");
+      return;
+    }
 
-  // useEffect(() => {
-  //   if (!isLoggedIn && window.location.pathname !== '/auth/feishu') {
-  //     window.location.assign("https://accounts.feishu.cn/open-apis/authen/v1/authorize?client_id=cli_a71a0cebd21a900d&redirect_uri=http://localhost:3000/auth/feishu");
-  //   }
-  //   if (isLoggedIn && window.location.pathname !== '/auth/feishu') {
-  //     const token = getCookie("Authorization");
-  //     const payload = jwtDecode<JwtPayload>(token!);
-  //     setUserInfo(payload);
-  //   }
-  // }, [isLoggedIn]);
+    // Try to get user info if logged in
+    if (isLoggedIn && window.location.pathname !== '/auth/feishu') {
+      try {
+        const token = getCookie("Authorization");
+        console.log(token);
+        if (token) {
+          const payload = jwtDecode<JwtPayload>(token);
+          console.log(payload);
+          setUserInfo(payload);
+        }
+      } catch (error) {
+        console.error("Failed to decode token:", error);
+      }
+    }
+  }, [isLoggedIn]);
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 
@@ -120,7 +128,9 @@ export default function NavBar() {
           </div>
 
           <div className="flex items-center">
-            <Image src="/example.jpg" alt="IronPulse" width={45} height={45} className="rounded-full" />
+            {userInfo?.avatarUrl && <Image src={userInfo?.avatarUrl} onClick={()=>{
+              window.location.assign("https://accounts.feishu.cn/open-apis/authen/v1/authorize?client_id=cli_a71a0cebd21a900d&redirect_uri=http://localhost:3000/auth/feishu");
+            }} alt="IronPulse" width={45} height={45} className="rounded-full" />}
           </div>
         </div>
 

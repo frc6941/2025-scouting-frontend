@@ -4,39 +4,159 @@ import React, { useState, useRef } from 'react';
 import { Camera, X } from 'lucide-react';
 import { Input, Button, Card } from "@heroui/react";
 import { Checkbox } from "@/components/ui/checkbox";
+import { getCookie } from 'cookies-next/client';
+import { jwtDecode } from 'jwt-decode';
+import { JwtPayload } from '@/components/NavBar';
+import router from 'next/router';
+import { toast } from '@/hooks/use-toast';
 
 export default function PitScouting() {
   const [photos, setPhotos] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [formData, setFormData] = useState({
+    teamNumber: '',
+    capabilities: {
+      amp: false,
+      speaker: false,
+      trap: false
+    },
+    chassisType: '',
+    cycleTime: '',
+    autoType: '',
+    photos: [] as string[]
+  });
+
+  // Add image compression function
+  const compressImage = (base64: string): Promise<string> => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.src = base64;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d')!;
+        
+        // Set compressed dimensions
+        const maxWidth = 800;
+        const maxHeight = 800;
+        let width = img.width;
+        let height = img.height;
+        
+        if (width > height) {
+          if (width > maxWidth) {
+            height *= maxWidth / width;
+            width = maxWidth;
+          }
+        } else {
+          if (height > maxHeight) {
+            width *= maxHeight / height;
+            height = maxHeight;
+          }
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', 0.6)); // Compress quality to 0.6
+      };
+    });
+  };
 
   // Handle file selection or capture
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files) return;
 
-    // Convert FileList to Array and process each file
-    const fileArray = Array.from(files);
-    
-    // Process each file
-    fileArray.forEach(file => {
+    Array.from(files).forEach(file => {
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setPhotos(prev => [...prev, reader.result as string]);
+      reader.onloadend = async () => {
+        const compressed = await compressImage(reader.result as string);
+        setPhotos(prev => [...prev, compressed]);
       };
       reader.readAsDataURL(file);
     });
 
-    // Reset the input so the same file can be selected again
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
   };
 
   // Handle form submission
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted");
-    // Add your form submission logic here
+    try {
+      const token = getCookie("Authorization");
+      if (!token) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Not authenticated. Please login first.",
+        });
+        return;
+      }
+
+      const submitData = {
+        teamNumber: parseInt(formData.teamNumber),
+        capabilities: formData.capabilities,
+        chassisType: formData.chassisType,
+        cycleTime: parseInt(formData.cycleTime),
+        autoType: formData.autoType,
+        photos: photos.map(photo => photo.split(',')[1].substring(0, 100000)) // Limit image size
+      };
+
+      console.log("Submitting data:", submitData);  
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/pit-scouting/create`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(submitData)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to submit');
+      }
+
+      const data = await response.json();
+      toast({
+        title: "Success!",
+        description: "Form submitted successfully",
+      });
+      
+      setTimeout(() => {
+        router.push("/");
+      }, 1500);
+
+    } catch (error) {
+      console.error("Submit error:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to submit form",
+      });
+    }
+  };
+
+  // Handle input changes
+  const handleInputChange = (field: string, value: any) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  // Handle checkbox changes
+  const handleCheckboxChange = (field: string, checked: boolean) => {
+    setFormData(prev => ({
+      ...prev,
+      capabilities: {
+        ...prev.capabilities,
+        [field]: checked
+      }
+    }));
   };
 
   // Remove a photo
@@ -65,6 +185,8 @@ export default function PitScouting() {
                   placeholder="Enter team number" 
                   variant="bordered"
                   className="max-w-xs"
+                  value={formData.teamNumber}
+                  onChange={(e) => handleInputChange('teamNumber', e.target.value)}
                 />
               </div>
 
@@ -73,7 +195,11 @@ export default function PitScouting() {
                 <h2 className="text-xl font-google-sans font-semibold">Robot Capabilities</h2>
                 <div className="grid gap-4">
                   <div className="flex items-center space-x-2">
-                    <Checkbox id="amp" />
+                    <Checkbox 
+                      id="amp"
+                      checked={formData.capabilities.amp}
+                      onCheckedChange={(checked) => handleCheckboxChange('amp', checked as boolean)}
+                    />
                     <label
                       htmlFor="amp"
                       className="text-sm font-medium leading-none"
@@ -82,7 +208,11 @@ export default function PitScouting() {
                     </label>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <Checkbox id="speaker" />
+                    <Checkbox 
+                      id="speaker"
+                      checked={formData.capabilities.speaker}
+                      onCheckedChange={(checked) => handleCheckboxChange('speaker', checked as boolean)}
+                    />
                     <label
                       htmlFor="speaker"
                       className="text-sm font-medium leading-none"
@@ -91,7 +221,11 @@ export default function PitScouting() {
                     </label>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <Checkbox id="trap" />
+                    <Checkbox 
+                      id="trap"
+                      checked={formData.capabilities.trap}
+                      onCheckedChange={(checked) => handleCheckboxChange('trap', checked as boolean)}
+                    />
                     <label
                       htmlFor="trap"
                       className="text-sm font-medium leading-none"
@@ -110,6 +244,8 @@ export default function PitScouting() {
                   placeholder="Enter chassis type" 
                   variant="bordered"
                   className="max-w-xs"
+                  value={formData.chassisType}
+                  onChange={(e) => handleInputChange('chassisType', e.target.value)}
                 />
               </div>
 
@@ -122,6 +258,8 @@ export default function PitScouting() {
                   placeholder="Enter cycle time" 
                   variant="bordered"
                   className="max-w-xs"
+                  value={formData.cycleTime}
+                  onChange={(e) => handleInputChange('cycleTime', e.target.value)}
                 />
               </div>
 
@@ -133,6 +271,8 @@ export default function PitScouting() {
                   placeholder="Enter auto type" 
                   variant="bordered"
                   className="max-w-xs"
+                  value={formData.autoType}
+                  onChange={(e) => handleInputChange('autoType', e.target.value)}
                 />
               </div>
             </div>

@@ -8,6 +8,14 @@ import { Description as DescriptionIcon, Flag as FlagIcon } from "@mui/icons-mat
 import { useToast } from "@/hooks/use-toast";
 import { getCookie } from 'cookies-next/client';
 
+export enum StopStatus {
+  PARK = 'Park',
+  DEEP = 'Deep Climb',
+  SHALLOW = 'Shallow Climb',
+  FAILED = 'Failed',
+  PLAYED_DEFENSE = 'Played Defense',
+}
+
 const Step5 = () => {
   // @ts-ignore
   const { formData, setFormData } = useForm();
@@ -19,19 +27,23 @@ const Step5 = () => {
   };
 
   const endGameStates = [
-    { key: "PARK", label: "Park" },
-    { key: "DEEP", label: "Deep Climb" },
-    { key: "SHALLOW", label: "Shallow Climb" },
-    { key: "FAILED", label: "Failed" },
-    { key: "PLAYED_DEFENSE", label: "Played Defense" },
+    { key: StopStatus.PARK, label: "Park" },
+    { key: StopStatus.DEEP, label: "Deep Climb" },
+    { key: StopStatus.SHALLOW, label: "Shallow Climb" },
+    { key: StopStatus.FAILED, label: "Failed" },
+    { key: StopStatus.PLAYED_DEFENSE, label: "Played Defense" },
   ];
 
   async function onSubmit() {
-    console.log(formData);
+    // console.log(formData);
+    console.log("json data",JSON.stringify(formData));
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/scouting/record`, {
         method: "POST",
-        headers: {"Authorization": `Bearer ${getCookie("Authorization")}`},
+        headers: {
+          "Authorization": `Bearer ${getCookie("Authorization")}`,
+          "Content-Type": "application/json"
+        },
         body: JSON.stringify(formData),
       });
       const data = await response.json();
@@ -39,6 +51,7 @@ const Step5 = () => {
       if (!(data.message)) {
         toast({
           title: "Success!",
+          variant: "default",
           description: "Form submitted successfully",
         });
         setTimeout(() => {
@@ -85,9 +98,8 @@ const Step5 = () => {
               className="w-full"
               variant="underlined"
               description="end game position"
-              selectedKeys={formData.endAndAfterGame.endGameState}
+              selectedKeys={new Set([formData.endAndAfterGame.stopStatus])}
               onSelectionChange={(e) => {
-                console.log(e.currentKey)
                 setFormData({
                   ...formData,
                   endAndAfterGame: {

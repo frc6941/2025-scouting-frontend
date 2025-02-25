@@ -7,12 +7,22 @@ import { Button, Card } from "@heroui/react";
 import { toast } from "@/hooks/use-toast";
 import { Select, SelectItem } from "@heroui/react";
 
+export enum MatchType {
+  QUAL = 'Qualification',
+  PRAC = 'Practice',
+  MATCH = 'Match',
+  FINAL = 'Final',
+}
+
+export enum Alliance {
+  RED = 'Red',
+  BLUE = 'Blue',
+}
+
 export default function Step1() {
   // @ts-ignore
   const { formData, setFormData } = useForm();
   const router = useRouter();
-
-
 
   const handleNext = () => {
 
@@ -42,9 +52,8 @@ export default function Step1() {
         <div className="h-1 w-16 bg-primary mx-auto rounded-full"/>
       </div>
 
-      <div className="flex flex-col gap-6 sm:gap-12">
-        {/* Left Section */}
-        <section className="space-y-6 sm:space-y-8">
+      <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
+        <section className="w-full lg:w-1/2 space-y-6 sm:space-y-8">
           <Card className="p-4 sm:p-8 backdrop-blur-md hover:shadow-xl transition-shadow duration-300 border-1 border-black dark:border-white">
             <div className="space-y-6 sm:space-y-8">
               <div>
@@ -57,10 +66,10 @@ export default function Step1() {
                   onSelectionChange={(keys) => handleInputChange('matchType', keys)}
                   isRequired
                 >
-                  <SelectItem key="QUAL">Qualification</SelectItem>
-                  <SelectItem key="PRAC">Practice</SelectItem>
-                  <SelectItem key="MATCH">Match</SelectItem>
-                  <SelectItem key="FIANL">Final</SelectItem>
+                  <SelectItem key={MatchType.QUAL}>{MatchType.QUAL}</SelectItem>
+                  <SelectItem key={MatchType.PRAC}>{MatchType.PRAC}</SelectItem>
+                  <SelectItem key={MatchType.MATCH}>{MatchType.MATCH}</SelectItem>
+                  <SelectItem key={MatchType.FINAL}>{MatchType.FINAL}</SelectItem>
                 </Select>
               </div>
 
@@ -86,9 +95,8 @@ export default function Step1() {
           </Card>
         </section>
 
-        {/* Right Section */}
-        <section className="space-y-6 sm:space-y-8">
-          <Card className="p-4 sm:p-8 backdrop-blur-md hover:shadow-xl transition-shadow duration-300 border-1 border-black dark:border-white">
+        <section className="w-full lg:w-1/2 space-y-6 sm:space-y-8">
+          <Card className="h-full p-4 sm:p-8 backdrop-blur-md hover:shadow-xl transition-shadow duration-300 border-1 border-black dark:border-white">
             <div className="space-y-6 sm:space-y-8">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-3">
                 <div>
