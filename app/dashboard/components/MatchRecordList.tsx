@@ -288,7 +288,7 @@ function TeamStatsModal({ team }) {
 }
 
 export function MatchRecordList({ teamNumber, matchType }) {
-  const [records, setRecords] = useState<GroupedMatchRecord[] | MatchRecord[]>([]);
+  const [records, setRecords] = useState<GroupedMatchRecord[] & MatchRecord[]>([]);
   const [selectedMatch, setSelectedMatch] = useState<GroupedMatchRecord | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showStats, setShowStats] = useState(false);
@@ -371,7 +371,7 @@ export function MatchRecordList({ teamNumber, matchType }) {
     }
   }, [teamNumber, matchType]);
 
-  const renderTeamDetails = (team: GroupedMatchRecord & MatchRecord, matchNumber) => (
+  const renderTeamDetails = (team, matchNumber) => (
     <div key={team.id} className="border-b last:border-b-0 py-4">
       <div className="flex justify-between items-center mb-2">
         <div className="flex items-center gap-4">
