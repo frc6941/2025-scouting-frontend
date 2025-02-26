@@ -8,6 +8,8 @@ interface Response {
   accessToken: string;
 }
 
+export const dynamic = 'force-dynamic'
+
 export default function FeishuAuthPage() {
   const searchParams = useSearchParams();
   const code = searchParams.get("code");
@@ -22,12 +24,11 @@ export default function FeishuAuthPage() {
       );
       const token: Response = await data.json();
       setCookie("Authorization", token.accessToken);
-      console.log(token.accessToken);
       await new Promise(resolve => setTimeout(resolve, 300));
       window.location.href = "/";
     }
     fetchData();
   }, [code]);
 
-  return (<Suspense></Suspense>);
+  return (<></>);
 }
