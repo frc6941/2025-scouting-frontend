@@ -301,7 +301,7 @@ export function MatchRecordList({ teamNumber, matchType }) {
       // Fetch all teams' records
       fetch(`${process.env.NEXT_PUBLIC_API_URL}/scouting/teams`)
         .then(res => res.json())
-        .then((data: GroupedMatchRecord[]) => {
+        .then((data: MatchRecord[]) => {
           // Group records by match
           const groupedRecords = data.reduce((acc, record) => {
             const matchKey = `${record.matchNumber}`;
