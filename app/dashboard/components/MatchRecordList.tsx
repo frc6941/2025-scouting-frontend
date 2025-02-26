@@ -371,7 +371,7 @@ export function MatchRecordList({ teamNumber, matchType }) {
     }
   }, [teamNumber, matchType]);
 
-  const renderTeamDetails = (team, matchNumber) => (
+  const renderTeamDetails = (team: GroupedMatchRecord, matchNumber) => (
     <div key={team.id} className="border-b last:border-b-0 py-4">
       <div className="flex justify-between items-center mb-2">
         <div className="flex items-center gap-4">
