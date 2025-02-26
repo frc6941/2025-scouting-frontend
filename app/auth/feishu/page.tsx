@@ -1,7 +1,7 @@
 "use client";
 
 import {useSearchParams} from "next/navigation";
-import {useEffect} from "react";
+import {useEffect, Suspense} from "react";
 import {setCookie} from "cookies-next/client";
 
 interface Response {
@@ -29,5 +29,5 @@ export default function FeishuAuthPage() {
     fetchData();
   }, [code]);
 
-  return (<></>);
+  return (<Suspense></Suspense>);
 }
