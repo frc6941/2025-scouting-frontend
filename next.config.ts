@@ -4,7 +4,10 @@ const nextConfig: NextConfig = {
   images: {
     domains: ["s1-imfile.feishucdn.com","s3-imfile.feishucdn.com"], 
   },
-  output: "standalone"
+  output: "standalone",
+  experimental: {
+    missingSuspenseWithCSRBailout: false,
+  },
 };
 
 export default nextConfig;
