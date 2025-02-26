@@ -136,6 +136,10 @@ export default function PitScouting() {
         throw new Error(errorData.message || 'Failed to submit');
       }
 
+      if (router.isFallback) {
+        return <div>Loading...</div>
+      }
+
       const data = await response.json();
       toast({
         title: "Success!",
