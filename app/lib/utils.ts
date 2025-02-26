@@ -1,11 +1,23 @@
-import { clsx, type ClassValue } from "clsx"
-import { twMerge } from "tailwind-merge"
-
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+interface CoralCount {
+  l4: number;
+  l3: number;
+  l2: number;
+  l1: number;
+  dropOrMiss: number;
 }
 
-export function calculateScore(phase: { coralCount: any; algaeCount: any }) {
+interface AlgaeCount {
+  netShot: number;
+  processor: number;
+  dropOrMiss: number;
+}
+
+interface Phase {
+  coralCount: CoralCount;
+  algaeCount: AlgaeCount;
+}
+
+export function calculateScore(phase: Phase | null | undefined): number {
   if (!phase) return 0;
   
   const coralPoints = {
@@ -20,7 +32,7 @@ export function calculateScore(phase: { coralCount: any; algaeCount: any }) {
   // Calculate coral points
   if (phase.coralCount) {
     Object.entries(coralPoints).forEach(([level, points]) => {
-      score += (phase.coralCount[level] || 0) * points;
+      score += (phase.coralCount[level as keyof CoralCount] || 0) * points;
     });
   }
 
@@ -31,4 +43,4 @@ export function calculateScore(phase: { coralCount: any; algaeCount: any }) {
   }
 
   return score;
-}
+} 

@@ -35,9 +35,6 @@ const Step5 = () => {
   ];
 
   async function onSubmit() {
-    // console.log(formData);
-    console.log("json data",JSON.stringify(formData));
-    try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/scouting/record`, {
         method: "POST",
         headers: {
@@ -46,33 +43,30 @@ const Step5 = () => {
         },
         body: JSON.stringify(formData),
       });
-      const data = await response.json();
-      console.log(data);
-      if (!(data.message)) {
-        toast({
-          title: "Success!",
-          variant: "default",
-          description: "Form submitted successfully",
-        });
-        setTimeout(() => {
-          router.push("/");
-        }, 1500);
+
+
+      const text = await response.text(); // First get the response as text
+      let data;
+      try {
+        data = text ? JSON.parse(text) : {}; // Try to parse if there's content
+      } catch (e) {
+        console.error('Failed to parse JSON:', text);
+        data = {};
       }
-      else {
+
+      if (response.ok) {
+        toast({
+          title: "Success",
+          description: "Match record submitted successfully",
+        });
+        router.push("/dashboard");
+      } else {
         toast({
           variant: "destructive",
           title: "Error",
-          description: data.message,
+          description: data.message || "Failed to submit match record",
         });
       }
-
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error.message || "Something went wrong, contact the admin",
-      });
-    }
   }
 
   return (

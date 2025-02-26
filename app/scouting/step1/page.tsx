@@ -73,24 +73,7 @@ export default function Step1() {
                 </Select>
               </div>
 
-              <div>
-                <label className="text-lg sm:text-xl text-default-600 block font-google-sans font-extrabold">
-                  Scouter Initials
-                </label>
-                <Input
-                  size="lg"
-                  className="w-full backdrop-blur-sm text-base sm:text-lg"
-                  label="Enter your initials"
-                  variant="underlined"
-                  description="Enter Scouter Name"
-                  value={formData.scouter}
-                  onChange={(e) => setFormData({
-                    ...formData,
-                    scouter: e.target.value,
-                  })}
-                  isRequired
-                />
-              </div>
+
             </div>
           </Card>
         </section>

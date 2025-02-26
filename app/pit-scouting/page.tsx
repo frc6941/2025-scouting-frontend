@@ -7,12 +7,13 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { getCookie } from 'cookies-next/client';
 import { jwtDecode } from 'jwt-decode';
 import { JwtPayload } from '@/components/NavBar';
-import router from 'next/router';
+import { useRouter } from 'next/navigation';
 import { toast } from '@/hooks/use-toast';
 
 export default function PitScouting() {
   const [photos, setPhotos] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const router = useRouter();
   const [formData, setFormData] = useState({
     teamNumber: '',
     capabilities: {
@@ -35,29 +36,44 @@ export default function PitScouting() {
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d')!;
         
-        // Set compressed dimensions
-        const maxWidth = 800;
-        const maxHeight = 800;
+        // Reduce maximum dimensions
+        const maxWidth = 600;  // Reduced from 800
+        const maxHeight = 600; // Reduced from 800
         let width = img.width;
         let height = img.height;
         
+        // Calculate new dimensions while maintaining aspect ratio
         if (width > height) {
           if (width > maxWidth) {
-            height *= maxWidth / width;
+            height = Math.round(height * maxWidth / width);
             width = maxWidth;
           }
         } else {
           if (height > maxHeight) {
-            width *= maxHeight / height;
+            width = Math.round(width * maxHeight / height);
             height = maxHeight;
           }
         }
         
-        canvas.width = width;
-        canvas.height = height;
+        // Create a temporary canvas for multi-step compression
+        const tempCanvas = document.createElement('canvas');
+        const tempCtx = tempCanvas.getContext('2d')!;
         
-        ctx.drawImage(img, 0, 0, width, height);
-        resolve(canvas.toDataURL('image/jpeg', 0.6)); // Compress quality to 0.6
+        // Step 1: Initial resize
+        tempCanvas.width = width;
+        tempCanvas.height = height;
+        tempCtx.drawImage(img, 0, 0, width, height);
+        
+        // Step 2: Further reduce final dimensions
+        canvas.width = Math.round(width * 0.8);  // 20% smaller
+        canvas.height = Math.round(height * 0.8);
+        
+        // Step 3: Final draw with smoothing
+        ctx.imageSmoothingQuality = 'high';
+        ctx.drawImage(tempCanvas, 0, 0, canvas.width, canvas.height);
+        
+        // Step 4: Export with lower quality
+        resolve(canvas.toDataURL('image/jpeg', 0.4)); // Reduced quality from 0.6 to 0.4
       };
     });
   };
@@ -204,7 +220,7 @@ export default function PitScouting() {
                       htmlFor="amp"
                       className="text-sm font-medium leading-none"
                     >
-                      能放 Amp
+                      L4
                     </label>
                   </div>
                   <div className="flex items-center space-x-2">
@@ -217,7 +233,7 @@ export default function PitScouting() {
                       htmlFor="speaker"
                       className="text-sm font-medium leading-none"
                     >
-                      能投 Speaker
+                      Netshot
                     </label>
                   </div>
                   <div className="flex items-center space-x-2">
@@ -230,7 +246,7 @@ export default function PitScouting() {
                       htmlFor="trap"
                       className="text-sm font-medium leading-none"
                     >
-                      能放 Trap
+                      Processor
                     </label>
                   </div>
                 </div>
