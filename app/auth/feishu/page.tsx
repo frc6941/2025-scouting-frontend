@@ -8,9 +8,7 @@ interface Response {
   accessToken: string;
 }
 
-export const dynamic = 'force-dynamic'
-
-export default function FeishuAuthPage() {
+const ParamsComponent = () => {
   const searchParams = useSearchParams();
   const code = searchParams.get("code");
 
@@ -29,6 +27,11 @@ export default function FeishuAuthPage() {
     }
     fetchData();
   }, [code]);
+  return <></>;
+}
 
-  return (<></>);
+export default function FeishuAuthPage() {
+  return (<Suspense>
+    <ParamsComponent></ParamsComponent>
+  </Suspense>);
 }
