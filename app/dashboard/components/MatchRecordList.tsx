@@ -288,7 +288,7 @@ function TeamStatsModal({ team }) {
 }
 
 export function MatchRecordList({ teamNumber, matchType }) {
-  const [records, setRecords] = useState<GroupedMatchRecord[] & MatchRecord[]>([]);
+  const [records, setRecords] = useState<GroupedMatchRecord[] | MatchRecord[]>([]);
   const [selectedMatch, setSelectedMatch] = useState<GroupedMatchRecord | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showStats, setShowStats] = useState(false);
@@ -424,7 +424,7 @@ export function MatchRecordList({ teamNumber, matchType }) {
       <Card className="p-6">
         <h2 className="text-2xl font-bold mb-4">Match Records</h2>
         <div className="space-y-4">
-          {records
+          {(records as MatchRecord)
             .filter(match => !teamNumber || match.teams.some(t => t.team === teamNumber))
             .map((match) => (
               <div key={match.matchNumber} className="p-4 border rounded-lg bg-default-50 hover:bg-default-100 transition-colors">
