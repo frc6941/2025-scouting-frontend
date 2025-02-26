@@ -15,7 +15,7 @@ const ParamsComponent = () => {
   useEffect(() => {
     async function fetchData() {
       const data = await fetch(
-        `http://localhost:3001/auth/feishu/authenticate?code=${code}`,
+        `http://api.ironpulse.net/auth/feishu/authenticate?code=${code}`,
         {
           mode: "cors",
         }
