@@ -8,7 +8,7 @@ import { Description as DescriptionIcon, Flag as FlagIcon } from "@mui/icons-mat
 import { useToast } from "@/hooks/use-toast";
 import { getCookie } from 'cookies-next/client';
 
-export enum StopStatus {
+enum StopStatus {
   PARK = 'Park',
   DEEP = 'Deep Climb',
   SHALLOW = 'Shallow Climb',

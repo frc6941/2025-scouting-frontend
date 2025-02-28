@@ -7,14 +7,14 @@ import { Button, Card } from "@heroui/react";
 import { toast } from "@/hooks/use-toast";
 import { Select, SelectItem } from "@heroui/react";
 
-export enum MatchType {
+enum MatchType {
   QUAL = 'Qualification',
   PRAC = 'Practice',
   MATCH = 'Match',
   FINAL = 'Final',
 }
 
-export enum Alliance {
+enum Alliance {
   RED = 'Red',
   BLUE = 'Blue',
 }

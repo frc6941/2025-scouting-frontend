@@ -9,7 +9,14 @@ export function TeamComparisonChart({ records }) {
 
   useEffect(() => {
     if (!records || !chartRef.current || !scatterRef.current) return;
-
+    interface TeamData {
+      matches: any[],
+      autoScores: any[],
+      teleopScores: any[],
+      totalScores: any[],
+      climbSuccess: number,
+      matchCount: number
+    };
     // Group records by team
     const teamData = records.reduce((acc, record) => {
       if (!acc[record.team]) {
@@ -65,7 +72,7 @@ export function TeamComparisonChart({ records }) {
       },
       xAxis: {
         type: 'category',
-        data: Array.from({ length: Math.max(...Object.values(teamData).map(d => d.matches.length!)) }, (_, i) => `Match ${i + 1}`),
+        data: Array.from({ length: Math.max(...Object.values(teamData).map(d => (d as TeamData).matches.length!)) }, (_, i) => `Match ${i + 1}`),
         name: 'Match Number'
       },
       yAxis: {

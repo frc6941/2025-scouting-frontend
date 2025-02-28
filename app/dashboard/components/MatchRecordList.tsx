@@ -168,7 +168,7 @@ function MatchStatsModal({ match, onClose }) {
                   {Object.entries(stats.coralLevelStats.auto).map(([level, count]) => (
                     <div key={level} className="flex justify-between items-center">
                       <span>Level {level.toUpperCase()}</span>
-                      <span className="font-medium">{count}</span>
+                      <span className="font-medium">{count as number}</span>
                     </div>
                   ))}
                 </div>
@@ -179,7 +179,7 @@ function MatchStatsModal({ match, onClose }) {
                   {Object.entries(stats.coralLevelStats.teleop).map(([level, count]) => (
                     <div key={level} className="flex justify-between items-center">
                       <span>Level {level.toUpperCase()}</span>
-                      <span className="font-medium">{count}</span>
+                      <span className="font-medium">{count as number}</span>
                     </div>
                   ))}
                 </div>
@@ -211,7 +211,7 @@ function TeamStatsModal({ team }) {
               {Object.entries(team.autonomous.coralCount).map(([level, count]) => (
                 <div key={level} className="flex justify-between items-center">
                   <span className="capitalize">{level.replace(/([A-Z])/g, ' $1').trim()}</span>
-                  <span className="font-medium">{count}</span>
+                  <span className="font-medium">{count as number}</span>
                 </div>
               ))}
             </div>
@@ -222,7 +222,7 @@ function TeamStatsModal({ team }) {
               {Object.entries(team.autonomous.algaeCount).map(([type, count]) => (
                 <div key={type} className="flex justify-between items-center">
                   <span className="capitalize">{type.replace(/([A-Z])/g, ' $1').trim()}</span>
-                  <span className="font-medium">{count}</span>
+                  <span className="font-medium">{count as number}</span>
                 </div>
               ))}
             </div>
@@ -246,7 +246,7 @@ function TeamStatsModal({ team }) {
               {Object.entries(team.teleop.coralCount).map(([level, count]) => (
                 <div key={level} className="flex justify-between items-center">
                   <span className="capitalize">{level.replace(/([A-Z])/g, ' $1').trim()}</span>
-                  <span className="font-medium">{count}</span>
+                  <span className="font-medium">{count as number}</span>
                 </div>
               ))}
             </div>
@@ -257,7 +257,7 @@ function TeamStatsModal({ team }) {
               {Object.entries(team.teleop.algaeCount).map(([type, count]) => (
                 <div key={type} className="flex justify-between items-center">
                   <span className="capitalize">{type.replace(/([A-Z])/g, ' $1').trim()}</span>
-                  <span className="font-medium">{count}</span>
+                  <span className="font-medium">{count as number}</span>
                 </div>
               ))}
             </div>
@@ -424,7 +424,7 @@ export function MatchRecordList({ teamNumber, matchType }) {
       <Card className="p-6">
         <h2 className="text-2xl font-bold mb-4">Match Records</h2>
         <div className="space-y-4">
-          {records
+          {(records as GroupedMatchRecord[])
             .filter(match => !teamNumber || match.teams.some(t => t.team === teamNumber))
             .map((match) => (
               <div key={match.matchNumber} className="p-4 border rounded-lg bg-default-50 hover:bg-default-100 transition-colors">
