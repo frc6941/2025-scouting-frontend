@@ -17,30 +17,45 @@ interface Phase {
   algaeCount: AlgaeCount;
 }
 
-export function calculateScore(phase: Phase | null | undefined): number {
+export function calculateScore(phase: Phase | null | undefined, isAuto: boolean = false): number {
   if (!phase) return 0;
   
-  const coralPoints = {
-    l4: 5,
-    l3: 4,
-    l2: 3,
-    l1: 2
-  };
+  // Coral points
+  const coralPoints = isAuto ? 
+    { l1: 3, l2: 4, l3: 6, l4: 7 } : 
+    { l1: 2, l2: 3, l3: 4, l4: 5 };
+  
+  const coralScore = 
+    (phase.coralCount.l1 || 0) * coralPoints.l1 +
+    (phase.coralCount.l2 || 0) * coralPoints.l2 +
+    (phase.coralCount.l3 || 0) * coralPoints.l3 +
+    (phase.coralCount.l4 || 0) * coralPoints.l4;
 
-  let score = 0;
+  // Algae points are same for both auto and teleop
+  const algaeScore = 
+    (phase.algaeCount.netShot || 0) * 4 +
+    (phase.algaeCount.processor || 0) * 6;
 
-  // Calculate coral points
-  if (phase.coralCount) {
-    Object.entries(coralPoints).forEach(([level, points]) => {
-      score += (phase.coralCount[level as keyof CoralCount] || 0) * points;
-    });
+  return coralScore + algaeScore;
+}
+
+export function calculateEndGameScore(status: string): number {
+  switch (status) {
+    case 'Deep Climb':
+      return 12;
+    case 'Shallow Climb':
+      return 6;
+    case 'Park':
+      return 2;
+    default:
+      return 0;
   }
-
-  // Calculate algae points
-  if (phase.algaeCount) {
-    score += (phase.algaeCount.netShot || 0) * 3;
-    score += (phase.algaeCount.processor || 0) * 2;
-  }
-
-  return score;
 } 
+
+
+import { clsx, type ClassValue } from "clsx"
+import { twMerge } from "tailwind-merge"
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
+}

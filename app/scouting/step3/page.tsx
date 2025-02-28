@@ -27,7 +27,8 @@ export default function Step3() {
         ...prev.autonomous,
         coralCount: {
           ...prev.autonomous.coralCount,
-          [level.toLowerCase()]: prev.autonomous.coralCount[level.toLowerCase()] + 1
+          [level === "dropOrMiss" ? "dropOrMiss" : level.toLowerCase()]: 
+            (prev.autonomous.coralCount[level === "dropOrMiss" ? "dropOrMiss" : level.toLowerCase()] || 0) + 1
         }
       }
     }));
@@ -40,7 +41,8 @@ export default function Step3() {
         ...prev.autonomous,
         coralCount: {
           ...prev.autonomous.coralCount,
-          [level.toLowerCase()]: Math.max(0, prev.autonomous.coralCount[level.toLowerCase()] - 1)
+          [level === "dropOrMiss" ? "dropOrMiss" : level.toLowerCase()]: 
+            Math.max(0, prev.autonomous.coralCount[level === "dropOrMiss" ? "dropOrMiss" : level.toLowerCase()] - 1)
         }
       }
     }));

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import * as echarts from 'echarts';
+import { calculateScore, calculateEndGameScore } from '@/app/lib/utils';
 
 export function TeamComparisonChart({ records }) {
   const chartRef = useRef(null);
@@ -30,9 +31,10 @@ export function TeamComparisonChart({ records }) {
         };
       }
 
-      const autoScore = calculateScore(record.autonomous);
-      const teleopScore = calculateScore(record.teleop);
-      const totalScore = autoScore + teleopScore;
+      const autoScore = calculateScore(record.autonomous, true);
+      const teleopScore = calculateScore(record.teleop, false);
+      const endGameScore = calculateEndGameScore(record.endAndAfterGame.stopStatus);
+      const totalScore = autoScore + teleopScore + endGameScore;
 
       acc[record.team].matches.push(record.matchNumber);
       acc[record.team].autoScores.push(autoScore);
@@ -103,11 +105,13 @@ export function TeamComparisonChart({ records }) {
       tooltip: {
         formatter: function(params) {
           const team = params.data[3];
-          const climbRate = (teamData[team].climbSuccess / teamData[team].matchCount * 100).toFixed(1);
+          const deepClimbRate = (teamData[team].climbSuccess / teamData[team].matchCount * 100).toFixed(1);
+          const shallowClimbRate = (teamData[team].climbSuccess / teamData[team].matchCount * 100).toFixed(1);
           return `Team ${team}<br/>` +
                  `Avg Auto: ${params.data[0].toFixed(1)}<br/>` +
                  `Avg Teleop: ${params.data[1].toFixed(1)}<br/>` +
-                 `Climb Success: ${climbRate}%`;
+                 `Deep Climb: ${deepClimbRate}%<br/>` +
+                 `Shallow Climb: ${shallowClimbRate}%`;
         }
       },
       grid: {
@@ -115,11 +119,11 @@ export function TeamComparisonChart({ records }) {
         right: '10%'
       },
       xAxis: {
-        name: 'Average Auto Score',
+        name: 'Auto',
         type: 'value'
       },
       yAxis: {
-        name: 'Average Teleop Score',
+        name: 'Teleop',
         type: 'value'
       },
       series: [{
@@ -159,18 +163,6 @@ export function TeamComparisonChart({ records }) {
       <div ref={scatterRef} style={{ width: '100%', height: '400px' }} />
     </div>
   );
-}
-
-function calculateScore(phase: any) {
-  if (!phase) return 0;
-  let score = 0;
-  if (phase.coralCount) {
-    score += (phase.coralCount.l1 || 0) * 1;
-    score += (phase.coralCount.l2 || 0) * 2;
-    score += (phase.coralCount.l3 || 0) * 3;
-    score += (phase.coralCount.l4 || 0) * 4;
-  }
-  return score;
 }
 
 function average(arr: number[]): number {

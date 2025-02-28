@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Card, Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@heroui/react";
 import { ChevronDown, ChevronUp } from "lucide-react";
+import { calculateScore, calculateEndGameScore } from '@/app/lib/utils';
 
 interface MatchRecord {
   id: string;
@@ -58,34 +59,6 @@ interface GroupedMatchRecord {
   }[];
 }
 
-function calculateScore(phase: { coralCount: any; algaeCount: any }) {
-  if (!phase) return 0;
-  
-  const coralPoints = {
-    l4: 5,
-    l3: 4,
-    l2: 3,
-    l1: 2
-  };
-
-  let score = 0;
-
-  // Calculate coral points
-  if (phase.coralCount) {
-    Object.entries(coralPoints).forEach(([level, points]) => {
-      score += (phase.coralCount[level] || 0) * points;
-    });
-  }
-
-  // Calculate algae points
-  if (phase.algaeCount) {
-    score += (phase.algaeCount.netShot || 0) * 3;
-    score += (phase.algaeCount.processor || 0) * 2;
-  }
-
-  return score;
-}
-
 function calculateMatchStats(teams) {
   const stats = {
     totalAutoScore: 0,
@@ -100,8 +73,8 @@ function calculateMatchStats(teams) {
   };
 
   teams.forEach(team => {
-    const autoScore = calculateScore(team.autonomous);
-    const teleopScore = calculateScore(team.teleop);
+    const autoScore = calculateScore(team.autonomous, true);
+    const teleopScore = calculateScore(team.teleop, false);
     stats.totalAutoScore += autoScore;
     stats.totalTeleopScore += teleopScore;
 
@@ -371,45 +344,53 @@ export function MatchRecordList({ teamNumber, matchType }) {
     }
   }, [teamNumber, matchType]);
 
-  const renderTeamDetails = (team, matchNumber) => (
-    <div key={team.id} className="border-b last:border-b-0 py-4">
-      <div className="flex justify-between items-center mb-2">
-        <div className="flex items-center gap-4">
-          <h4 className="text-lg font-semibold">Team {team.team}</h4>
-          <span className={`px-3 py-1 rounded-full ${
-            team.alliance === 'Red' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'
-          }`}>
-            {team.alliance}
-          </span>
+  const renderTeamDetails = (team, matchNumber) => {
+    const autoScore = calculateScore(team.autonomous, true);
+    const teleopScore = calculateScore(team.teleop, false);
+    const endGameScore = calculateEndGameScore(team.endAndAfterGame.stopStatus);
+    
+    return (
+      <div key={team.id} className="border-b last:border-b-0 py-4">
+        <div className="flex justify-between items-center mb-2">
+          <div className="flex items-center gap-4">
+            <h4 className="text-lg font-semibold">Team {team.team}</h4>
+            <span className={`px-3 py-1 rounded-full ${
+              team.alliance === 'Red' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'
+            }`}>
+              {team.alliance}
+            </span>
+          </div>
+          <Button
+            color="primary"
+            variant="light"
+            size="sm"
+            onPress={() => {
+              setSelectedTeam(team);
+              setShowTeamStats(true);
+              setShowStats(false);
+              setIsModalOpen(true);
+            }}
+          >
+            View Stats
+          </Button>
         </div>
-        <Button
-          color="primary"
-          variant="light"
-          size="sm"
-          onPress={() => {
-            setSelectedTeam(team);
-            setShowTeamStats(true);
-          }}
-        >
-          View Stats
-        </Button>
+        <div className="grid grid-cols-3 gap-4">
+          <div>
+            <p className="text-sm text-gray-600">Auto Score</p>
+            <p className="font-medium">{autoScore}</p>
+          </div>
+          <div>
+            <p className="text-sm text-gray-600">Teleop Score</p>
+            <p className="font-medium">{teleopScore}</p>
+          </div>
+          <div>
+            <p className="text-sm text-gray-600">End Game</p>
+            <p className="font-medium">{team.endAndAfterGame.stopStatus}</p>
+          </div>
+        </div>
       </div>
-      <div className="grid grid-cols-3 gap-4">
-        <div>
-          <p className="text-sm text-gray-600">Auto Score</p>
-          <p className="font-medium">{calculateScore(team.autonomous)}</p>
-        </div>
-        <div>
-          <p className="text-sm text-gray-600">Teleop Score</p>
-          <p className="font-medium">{calculateScore(team.teleop)}</p>
-        </div>
-        <div>
-          <p className="text-sm text-gray-600">End Game</p>
-          <p className="font-medium">{team.endAndAfterGame.stopStatus}</p>
-        </div>
-      </div>
-    </div>
-  );
+    );
+  };
 
   const toggleMatchExpand = (matchNumber: number) => {
     setExpandedMatches(prev => 

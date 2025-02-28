@@ -62,7 +62,7 @@ export default function NavBar() {
   useEffect(() => {
     // Redirect to login if not logged in
     if (!isLoggedIn && window.location.pathname !== '/auth/feishu') {
-      window.location.assign("https://accounts.feishu.cn/open-apis/authen/v1/authorize?client_id=cli_a71a0cebd21a900d&redirect_uri=https://reefscout.ironpulse.net/auth/feishu");
+      window.location.assign(`https://accounts.feishu.cn/open-apis/authen/v1/authorize?client_id=cli_a71a0cebd21a900d&redirect_uri=${process.env.NEXT_PUBLIC_API_URL}/auth/feishu`);
       return;
     }
 
@@ -139,8 +139,8 @@ export default function NavBar() {
           </div>
 
           <div className="flex items-center">
-            {userInfo?.avatarUrl && <Image src={userInfo?.avatarUrl} onClick={()=>{
-              window.location.assign("https://accounts.feishu.cn/open-apis/authen/v1/authorize?client_id=cli_a71a0cebd21a900d&redirect_uri=http://localhost:3000/auth/feishu");
+            {userInfo?.avatarUrl && <img src={userInfo?.avatarUrl} onClick={()=>{
+              window.location.assign(`https://accounts.feishu.cn/open-apis/authen/v1/authorize?client_id=cli_a71a0cebd21a900d&redirect_uri=${process.env.NEXT_PUBLIC_API_URL}/auth/feishu`);
             }} alt="IronPulse" width={45} height={45} className="rounded-full" />}
           </div>
         </div>

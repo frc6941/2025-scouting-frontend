@@ -27,7 +27,7 @@ export default function Step4() {
         ...prev.teleop,
         coralCount: {
           ...prev.teleop.coralCount,
-          [level.toLowerCase()]: prev.teleop.coralCount[level.toLowerCase()] + 1
+          [level==="dropOrMiss"?"dropOrMiss":level.toLowerCase()]: prev.teleop.coralCount[level==="dropOrMiss"?"dropOrMiss":level.toLowerCase()] + 1
         }
       }
     }));
@@ -40,7 +40,7 @@ export default function Step4() {
         ...prev.teleop,
         coralCount: {
           ...prev.teleop.coralCount,
-          [level.toLowerCase()]: Math.max(0, prev.teleop.coralCount[level.toLowerCase()] - 1)
+          [level==="dropOrMiss"?"dropOrMiss":level.toLowerCase()]: Math.max(0, prev.teleop.coralCount[level==="dropOrMiss"?"dropOrMiss":level.toLowerCase()] - 1)
         }
       }
     }));

@@ -2,7 +2,7 @@
 
 import React, { useState, useRef } from 'react';
 import { Camera, X } from 'lucide-react';
-import { Input, Button, Card } from "@heroui/react";
+import { Input, Button, Card, Select, SelectItem, Textarea } from "@heroui/react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { getCookie } from 'cookies-next/client';
 import { jwtDecode } from 'jwt-decode';
@@ -17,13 +17,20 @@ export default function PitScouting() {
   const [formData, setFormData] = useState({
     teamNumber: '',
     capabilities: {
-      amp: false,
-      speaker: false,
-      trap: false
+      l1: false,
+      l2: false,
+      l3: false,
+      l4: false,
+      processor: false,
+      barge: false,
+      noClimb: false,
+      shallowClimb: false,
+      deepClimb: false,
     },
     chassisType: '',
     cycleTime: '',
     autoType: '',
+    comments: '',
     photos: [] as string[]
   });
 
@@ -113,6 +120,7 @@ export default function PitScouting() {
 
       const submitData = {
         teamNumber: parseInt(formData.teamNumber),
+        comments: formData.comments,
         capabilities: formData.capabilities,
         chassisType: formData.chassisType,
         cycleTime: parseInt(formData.cycleTime),
@@ -208,45 +216,104 @@ export default function PitScouting() {
 
               {/* Robot Capabilities Section */}
               <div className="space-y-4">
-                <h2 className="text-xl font-google-sans font-semibold">Robot Capabilities</h2>
+                <h2 className="text-xl font-google-sans font-semibold">能放 Coral</h2>
                 <div className="grid gap-4">
                   <div className="flex items-center space-x-2">
                     <Checkbox 
-                      id="amp"
-                      checked={formData.capabilities.amp}
-                      onCheckedChange={(checked) => handleCheckboxChange('amp', checked as boolean)}
+                      id="l1"
+                      checked={formData.capabilities.l1}
+                      onCheckedChange={(checked) => handleCheckboxChange('l1', checked as boolean)}
                     />
-                    <label
-                      htmlFor="amp"
-                      className="text-sm font-medium leading-none"
-                    >
+                    <label htmlFor="l1" className="text-sm font-medium leading-none">
+                      L1
+                    </label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox 
+                      id="l2"
+                      checked={formData.capabilities.l2}
+                      onCheckedChange={(checked) => handleCheckboxChange('l2', checked as boolean)}
+                    />
+                    <label htmlFor="l2" className="text-sm font-medium leading-none">
+                      L2
+                    </label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox 
+                      id="l3"
+                      checked={formData.capabilities.l3}
+                      onCheckedChange={(checked) => handleCheckboxChange('l3', checked as boolean)}
+                    />
+                    <label htmlFor="l3" className="text-sm font-medium leading-none">
+                      L3
+                    </label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox 
+                      id="l4"
+                      checked={formData.capabilities.l4}
+                      onCheckedChange={(checked) => handleCheckboxChange('l4', checked as boolean)}
+                    />
+                    <label htmlFor="l4" className="text-sm font-medium leading-none">
                       L4
                     </label>
                   </div>
+                </div>
+
+                <h2 className="text-xl font-google-sans font-semibold mt-6">能放 Algae</h2>
+                <div className="grid gap-4">
                   <div className="flex items-center space-x-2">
                     <Checkbox 
-                      id="speaker"
-                      checked={formData.capabilities.speaker}
-                      onCheckedChange={(checked) => handleCheckboxChange('speaker', checked as boolean)}
+                      id="processor"
+                      checked={formData.capabilities.processor}
+                      onCheckedChange={(checked) => handleCheckboxChange('processor', checked as boolean)}
                     />
-                    <label
-                      htmlFor="speaker"
-                      className="text-sm font-medium leading-none"
-                    >
-                      Netshot
+                    <label htmlFor="processor" className="text-sm font-medium leading-none">
+                      Processor
                     </label>
                   </div>
                   <div className="flex items-center space-x-2">
                     <Checkbox 
-                      id="trap"
-                      checked={formData.capabilities.trap}
-                      onCheckedChange={(checked) => handleCheckboxChange('trap', checked as boolean)}
+                      id="barge"
+                      checked={formData.capabilities.barge}
+                      onCheckedChange={(checked) => handleCheckboxChange('barge', checked as boolean)}
                     />
-                    <label
-                      htmlFor="trap"
-                      className="text-sm font-medium leading-none"
-                    >
-                      Processor
+                    <label htmlFor="barge" className="text-sm font-medium leading-none">
+                      Barge
+                    </label>
+                  </div>
+                </div>
+
+                <h2 className="text-xl font-google-sans font-semibold mt-6">爬升</h2>
+                <div className="grid gap-4">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox 
+                      id="noClimb"
+                      checked={formData.capabilities.noClimb}
+                      onCheckedChange={(checked) => handleCheckboxChange('noClimb', checked as boolean)}
+                    />
+                    <label htmlFor="noClimb" className="text-sm font-medium leading-none">
+                      不能爬
+                    </label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox 
+                      id="shallowClimb"
+                      checked={formData.capabilities.shallowClimb}
+                      onCheckedChange={(checked) => handleCheckboxChange('shallowClimb', checked as boolean)}
+                    />
+                    <label htmlFor="shallowClimb" className="text-sm font-medium leading-none">
+                      Shallow Climb
+                    </label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox 
+                      id="deepClimb"
+                      checked={formData.capabilities.deepClimb}
+                      onCheckedChange={(checked) => handleCheckboxChange('deepClimb', checked as boolean)}
+                    />
+                    <label htmlFor="deepClimb" className="text-sm font-medium leading-none">
+                      Deep Climb
                     </label>
                   </div>
                 </div>
@@ -344,6 +411,18 @@ export default function PitScouting() {
             </div>
           </div>
         </Card>
+
+        <div className="mb-6">
+          <h3 className="text-lg font-semibold mb-2">Additional Information</h3>
+          <Textarea
+            label="Additional Notes"
+            onChange={(e) => handleInputChange('comments', e.target.value)}
+            value={formData.comments}
+            placeholder="Enter any additional observations or notes about the team"
+            name="additionalInfo"
+            className="w-full min-h-[100px]"
+          />
+        </div>
 
         {/* Submit Buttons */}
         <div className="flex justify-end gap-4">

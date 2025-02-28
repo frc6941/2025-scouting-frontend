@@ -15,24 +15,27 @@ export default function DashboardPage() {
   const [selectedMatchType, setSelectedMatchType] = useState<string | null>(null);
   const [matchRecords, setMatchRecords] = useState([]);
 
-  // Add effect to fetch match records when team changes
-  useEffect(() => {
-    if (!selectedTeam) {
-      console.log("fetching all records");
-      fetch(`${process.env.NEXT_PUBLIC_API_URL}/scouting/teams`)
-        .then(res => res.json())
-        .then(data => {
-          console.log("all records", data);
-          setMatchRecords(Array.isArray(data) ? data : []);
-        })
-        .catch(err => console.error('Error fetching match records:', err));
-    } else {
-      fetch(`${process.env.NEXT_PUBLIC_API_URL}/scouting/${selectedTeam}/matches`)
-        .then(res => res.json())
-        .then(data => setMatchRecords(Array.isArray(data) ? data : []))
-        .catch(err => console.error('Error fetching match records:', err));
+  // Separate fetch function for reusability
+  const fetchMatchRecords = async () => {
+    try {
+      const url = selectedTeam 
+        ? `${process.env.NEXT_PUBLIC_API_URL}/scouting/${selectedTeam}/matches${selectedMatchType ? `?type=${selectedMatchType}` : ''}`
+        : `${process.env.NEXT_PUBLIC_API_URL}/scouting/teams${selectedMatchType ? `?type=${selectedMatchType}` : ''}`;
+
+      const response = await fetch(url);
+      const data = await response.json();
+      console.log("Fetched records:", data);
+      setMatchRecords(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error('Error fetching match records:', err);
+      setMatchRecords([]);
     }
-  }, [selectedTeam]);
+  };
+
+  // Effect for initial load and when filters change
+  useEffect(() => {
+    fetchMatchRecords();
+  }, [selectedTeam, selectedMatchType]);
 
   return (
     <main className="min-h-screen py-8">
@@ -55,30 +58,26 @@ export default function DashboardPage() {
           {/* Content Tabs */}
           <Tabs>
             <Tab key="matches" title="Match Records">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-4">
+              <div className="flex flex-col gap-6 mt-4">
                 {/* Performance Charts */}
-                <div className="space-y-6">
-                  {selectedTeam ? (
-                    <>
-                      <TeamStats teamNumber={selectedTeam} records={matchRecords} />
-                      <Card className="p-6">
-                        <TeamPerformanceChart records={matchRecords} />
-                      </Card>
-                    </>
-                  ) : (
+                {selectedTeam ? (
+                  <>
+                    <TeamStats teamNumber={selectedTeam} records={matchRecords} />
                     <Card className="p-6">
-                      <TeamComparisonChart records={matchRecords} />
+                      <TeamPerformanceChart records={matchRecords} />
                     </Card>
-                  )}
-                </div>
+                  </>
+                ) : (
+                  <Card className="p-6">
+                    <TeamComparisonChart records={matchRecords} />
+                  </Card>
+                )}
                 
                 {/* Match Records List */}
-                <div>
-                  <MatchRecordList 
-                    teamNumber={selectedTeam}
-                    matchType={selectedMatchType}
-                  />
-                </div>
+                <MatchRecordList 
+                  teamNumber={selectedTeam}
+                  matchType={selectedMatchType}
+                />
               </div>
             </Tab>
             <Tab key="pit" title="Pit Scouting">
