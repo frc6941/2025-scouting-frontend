@@ -75,10 +75,10 @@ export function TeamRankings({ matchRecords }: { matchRecords: MatchRecord[] }) 
       const team = record.team;
       if (!team) return;
 
-      // Calculate scores exactly like TeamPerformanceChart
       const autoScore = calculateScore(record.autonomous, true);
       const teleopScore = calculateScore(record.teleop, false);
       const endGameScore = calculateEndGameScore(record.endAndAfterGame.stopStatus);
+      const totalTeleopScore = teleopScore + endGameScore;
 
       if (!stats.has(team)) {
         stats.set(team, {
@@ -94,7 +94,7 @@ export function TeamRankings({ matchRecords }: { matchRecords: MatchRecord[] }) 
       const teamStats = stats.get(team)!;
       teamStats.matches++;
       teamStats.autoTotal += autoScore;
-      teamStats.teleopTotal += teleopScore;
+      teamStats.teleopTotal += totalTeleopScore;
       teamStats.endGameTotal += endGameScore;
 
       // Track climb success
@@ -108,8 +108,8 @@ export function TeamRankings({ matchRecords }: { matchRecords: MatchRecord[] }) 
     return Array.from(stats.entries()).map(([teamNumber, data]): TeamStats => ({
       teamNumber,
       avgAutoScore: data.autoTotal / data.matches,
-      avgTeleopScore: (data.teleopTotal + data.endGameTotal) / data.matches, // Include endgame in teleop
-      avgTotalScore: (data.autoTotal + data.teleopTotal + data.endGameTotal) / data.matches,
+      avgTeleopScore: data.teleopTotal / data.matches,
+      avgTotalScore: (data.autoTotal + data.teleopTotal) / data.matches,
       deepClimbRate: (data.deepClimbs / data.matches) * 100,
       shallowClimbRate: (data.shallowClimbs / data.matches) * 100,
       matches: data.matches

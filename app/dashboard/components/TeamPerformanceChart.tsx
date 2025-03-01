@@ -21,6 +21,9 @@ interface PerformanceData {
     l4: number[];
     processor: number[];
     net: number[];
+    deepClimb: number[];
+    shallowClimb: number[];
+    park: number[];
   };
   totalScores: number[];
   autoTotalScores: number[];
@@ -36,53 +39,66 @@ export function TeamPerformanceChart({ records }) {
   useEffect(() => {
     if (!records || !autoChartRef.current || !teleopChartRef.current || !totalScoreChartRef.current) return;
 
-    const data: PerformanceData = {
+    const data = {
       matchNumbers: [],
-      autoScores: { 
-        l1: [], l2: [], l3: [], l4: [], 
-        processor: [], net: [] 
+      autoScores: {
+        l1: [],
+        l2: [],
+        l3: [],
+        l4: [],
+        processor: [],
+        net: []
       },
-      teleopScores: { 
-        l1: [], l2: [], l3: [], l4: [], 
-        processor: [], net: [] 
+      teleopScores: {
+        l1: [],
+        l2: [],
+        l3: [],
+        l4: [],
+        processor: [],
+        net: [],
+        deepClimb: [],
+        shallowClimb: [],
+        park: []
       },
-      totalScores: [],
       autoTotalScores: [],
       teleopTotalScores: [],
-      endGameScores: []
+      endGameScores: [],
+      totalScores: []
     };
 
     records.sort((a, b) => a.matchNumber - b.matchNumber).forEach(record => {
       data.matchNumbers.push(record.matchNumber);
-      
-      // Auto scores
-      data.autoScores.l1.push(record.autonomous.coralCount.l1 || 0);
-      data.autoScores.l2.push(record.autonomous.coralCount.l2 || 0);
-      data.autoScores.l3.push(record.autonomous.coralCount.l3 || 0);
-      data.autoScores.l4.push(record.autonomous.coralCount.l4 || 0);
-      data.autoScores.processor.push(record.autonomous.algaeCount.processor || 0);
-      data.autoScores.net.push(record.autonomous.algaeCount.netShot || 0);
 
-      // Calculate auto total points
-      const autoTotal = calculateScore(record.autonomous, true);
-      data.autoTotalScores.push(autoTotal);
+      // Auto scores (multiply by points)
+      data.autoScores.l1.push((record.autonomous.coralCount.l1 || 0) * 3);
+      data.autoScores.l2.push((record.autonomous.coralCount.l2 || 0) * 4);
+      data.autoScores.l3.push((record.autonomous.coralCount.l3 || 0) * 6);
+      data.autoScores.l4.push((record.autonomous.coralCount.l4 || 0) * 7);
+      data.autoScores.processor.push((record.autonomous.algaeCount.processor || 0) * 6);
+      data.autoScores.net.push((record.autonomous.algaeCount.netShot || 0) * 4);
 
-      // Teleop scores
-      data.teleopScores.l1.push(record.teleop.coralCount.l1 || 0);
-      data.teleopScores.l2.push(record.teleop.coralCount.l2 || 0);
-      data.teleopScores.l3.push(record.teleop.coralCount.l3 || 0);
-      data.teleopScores.l4.push(record.teleop.coralCount.l4 || 0);
-      data.teleopScores.processor.push(record.teleop.algaeCount.processor || 0);
-      data.teleopScores.net.push(record.teleop.algaeCount.netShot || 0);
+      const autoScore = calculateScore(record.autonomous, true);
+      data.autoTotalScores.push(autoScore);
 
-      // Calculate teleop and endgame
-      const teleopTotal = calculateScore(record.teleop, false);
+      // Teleop scores (multiply by points)
+      data.teleopScores.l1.push((record.teleop.coralCount.l1 || 0) * 2);
+      data.teleopScores.l2.push((record.teleop.coralCount.l2 || 0) * 3);
+      data.teleopScores.l3.push((record.teleop.coralCount.l3 || 0) * 4);
+      data.teleopScores.l4.push((record.teleop.coralCount.l4 || 0) * 5);
+      data.teleopScores.processor.push((record.teleop.algaeCount.processor || 0) * 6);
+      data.teleopScores.net.push((record.teleop.algaeCount.netShot || 0) * 4);
+
+      // End game scores
+      data.teleopScores.deepClimb.push(record.endAndAfterGame.stopStatus === 'Deep Climb' ? 12 : 0);
+      data.teleopScores.shallowClimb.push(record.endAndAfterGame.stopStatus === 'Shallow Climb' ? 6 : 0);
+      data.teleopScores.park.push(record.endAndAfterGame.stopStatus === 'Park' ? 2 : 0);
+
+      const teleopScore = calculateScore(record.teleop, false);
       const endGameScore = calculateEndGameScore(record.endAndAfterGame.stopStatus);
-      data.teleopTotalScores.push(teleopTotal + endGameScore);
-      data.endGameScores.push(endGameScore);
 
-      // Total match score
-      data.totalScores.push(autoTotal + teleopTotal);
+      data.teleopTotalScores.push(teleopScore + endGameScore);
+      data.endGameScores.push(endGameScore);
+      data.totalScores.push(autoScore + teleopScore + endGameScore);
     });
 
     // Auto Chart
@@ -108,8 +124,10 @@ export function TeamPerformanceChart({ records }) {
           let total = 0;
           let tooltip = `Match ${params[0].axisValue}<br/>`;
           params.forEach(param => {
-            tooltip += `${param.seriesName}: ${param.value} (${param.value * parseInt(param.seriesName.match(/\((\d+)pts\)/)[1])} pts)<br/>`;
-            total += param.value * parseInt(param.seriesName.match(/\((\d+)pts\)/)[1]);
+            const points = parseInt(param.seriesName.match(/\((\d+)pts\)/)[1]);
+            const count = param.value / points;
+            tooltip += `${param.seriesName}: ${count} (${param.value} pts)<br/>`;
+            total += param.value;
           });
           tooltip += `<br/><strong>Total: ${total} points</strong>`;
           return tooltip;
@@ -137,43 +155,43 @@ export function TeamPerformanceChart({ records }) {
       },
       yAxis: {
         type: 'value',
-        name: 'Count'
+        name: 'Points'
       },
       series: [
         {
           name: 'L1 (3pts)',
           type: 'bar',
-          stack: 'auto',
+          stack: 'total',
           data: data.autoScores.l1
         },
         {
           name: 'L2 (4pts)',
           type: 'bar',
-          stack: 'auto',
+          stack: 'total',
           data: data.autoScores.l2
         },
         {
           name: 'L3 (6pts)',
           type: 'bar',
-          stack: 'auto',
+          stack: 'total',
           data: data.autoScores.l3
         },
         {
           name: 'L4 (7pts)',
           type: 'bar',
-          stack: 'auto',
+          stack: 'total',
           data: data.autoScores.l4
         },
         {
           name: 'Processor (6pts)',
           type: 'bar',
-          stack: 'auto',
+          stack: 'total',
           data: data.autoScores.processor
         },
         {
           name: 'Net (4pts)',
           type: 'bar',
-          stack: 'auto',
+          stack: 'total',
           data: data.autoScores.net
         }
       ]
@@ -186,7 +204,7 @@ export function TeamPerformanceChart({ records }) {
         text: 'Teleop Performance',
         left: 'center',
         top: 0,
-        subtext: `Average: ${average(data.teleopTotalScores).toFixed(1)} points (including endgame)`,
+        subtext: `Average: ${average(data.teleopTotalScores).toFixed(1)} points`,
         textStyle: {
           fontSize: 16
         },
@@ -202,12 +220,14 @@ export function TeamPerformanceChart({ records }) {
           let total = 0;
           let tooltip = `Match ${params[0].axisValue}<br/>`;
           params.forEach(param => {
-            tooltip += `${param.seriesName}: ${param.value} (${param.value * parseInt(param.seriesName.match(/\((\d+)pts\)/)[1])} pts)<br/>`;
-            total += param.value * parseInt(param.seriesName.match(/\((\d+)pts\)/)[1]);
+            if (param.seriesName.includes('pts')) {
+              const points = parseInt(param.seriesName.match(/\((\d+)pts\)/)[1]);
+              const count = param.value / points;
+              tooltip += `${param.seriesName}: ${count} (${param.value} pts)<br/>`;
+              total += param.value;
+            }
           });
-          const endGameScore = data.endGameScores[params[0].dataIndex];
-          tooltip += `Endgame: ${endGameScore} pts<br/>`;
-          tooltip += `<br/><strong>Total: ${total + endGameScore} points</strong>`;
+          tooltip += `<br/><strong>Total: ${total} points</strong>`;
           return tooltip;
         }
       },
@@ -234,62 +254,62 @@ export function TeamPerformanceChart({ records }) {
       },
       yAxis: {
         type: 'value',
-        name: 'Count'
+        name: 'Points'
       },
       series: [
         {
           name: 'L1 (2pts)',
           type: 'bar',
-          stack: 'teleop',
+          stack: 'total',
           data: data.teleopScores.l1
         },
         {
           name: 'L2 (3pts)',
           type: 'bar',
-          stack: 'teleop',
+          stack: 'total',
           data: data.teleopScores.l2
         },
         {
           name: 'L3 (4pts)',
           type: 'bar',
-          stack: 'teleop',
+          stack: 'total',
           data: data.teleopScores.l3
         },
         {
           name: 'L4 (5pts)',
           type: 'bar',
-          stack: 'teleop',
+          stack: 'total',
           data: data.teleopScores.l4
         },
         {
           name: 'Processor (6pts)',
           type: 'bar',
-          stack: 'teleop',
+          stack: 'total',
           data: data.teleopScores.processor
         },
         {
           name: 'Net (4pts)',
           type: 'bar',
-          stack: 'teleop',
+          stack: 'total',
           data: data.teleopScores.net
         },
         {
           name: 'Deep Climb (12pts)',
           type: 'bar',
-          stack: 'teleop',
-          data: records.map(record => record.endAndAfterGame.stopStatus === 'Deep Climb' ? 1 : 0)
+          stack: 'total',
+          data: data.teleopScores.deepClimb
         },
         {
           name: 'Shallow Climb (6pts)',
           type: 'bar',
-          stack: 'teleop',
-          data: records.map(record => record.endAndAfterGame.stopStatus === 'Shallow Climb' ? 1 : 0)
+          stack: 'total',
+          data: data.teleopScores.shallowClimb
         },
         {
           name: 'Park (2pts)',
           type: 'bar',
-          stack: 'teleop',
-          data: records.map(record => record.endAndAfterGame.stopStatus === 'Park' ? 1 : 0)
+          stack: 'total',
+          data: data.teleopScores.park
         }
       ]
     };
@@ -317,7 +337,7 @@ export function TeamPerformanceChart({ records }) {
           const matchIndex = params[0].dataIndex;
           return `Match ${data.matchNumbers[matchIndex]}<br/>` +
                  `Auto: ${data.autoTotalScores[matchIndex]} pts<br/>` +
-                 `Teleop: ${data.teleopTotalScores[matchIndex] - data.endGameScores[matchIndex]} pts<br/>` +
+                 `Teleop: ${data.teleopTotalScores[matchIndex]} pts<br/>` +
                  `Endgame: ${data.endGameScores[matchIndex]} pts<br/>` +
                  `<br/><strong>Total: ${data.totalScores[matchIndex]} points</strong>`;
         }

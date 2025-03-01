@@ -6,10 +6,10 @@ import { calculateScore, calculateEndGameScore } from '@/app/lib/utils';
 
 export function TeamComparisonChart({ records }) {
   const chartRef = useRef(null);
-  const scatterRef = useRef(null);
 
   useEffect(() => {
-    if (!records || !chartRef.current || !scatterRef.current) return;
+    if (!records || !chartRef.current) return;
+    
     interface TeamData {
       matches: any[],
       autoScores: any[],
@@ -18,6 +18,7 @@ export function TeamComparisonChart({ records }) {
       climbSuccess: number,
       matchCount: number
     };
+
     // Group records by team
     const teamData = records.reduce((acc, record) => {
       if (!acc[record.team]) {
@@ -41,7 +42,7 @@ export function TeamComparisonChart({ records }) {
       acc[record.team].teleopScores.push(teleopScore);
       acc[record.team].totalScores.push(totalScore);
       acc[record.team].matchCount++;
-      if (['DEEP', 'SHALLOW'].includes(record.endAndAfterGame.stopStatus)) {
+      if (['Deep Climb', 'Shallow Climb'].includes(record.endAndAfterGame.stopStatus)) {
         acc[record.team].climbSuccess++;
       }
 
@@ -79,7 +80,7 @@ export function TeamComparisonChart({ records }) {
       },
       yAxis: {
         type: 'value',
-        name: ''
+        name: 'Points'
       },
       series: Object.entries(teamData).map(([team, data]) => ({
         name: `Team ${team}`,
@@ -95,64 +96,16 @@ export function TeamComparisonChart({ records }) {
       }))
     };
 
-    // Team Statistics Scatter Plot
-    const scatter = echarts.init(scatterRef.current);
-    const scatterOption = {
-      title: {
-        text: 'Team Performance Analysis',
-        left: 'center'
-      },
-      tooltip: {
-        formatter: function(params) {
-          const team = params.data[3];
-          const deepClimbRate = (teamData[team].climbSuccess / teamData[team].matchCount * 100).toFixed(1);
-          const shallowClimbRate = (teamData[team].climbSuccess / teamData[team].matchCount * 100).toFixed(1);
-          return `Team ${team}<br/>` +
-                 `Avg Auto: ${params.data[0].toFixed(1)}<br/>` +
-                 `Avg Teleop: ${params.data[1].toFixed(1)}<br/>` +
-                 `Deep Climb: ${deepClimbRate}%<br/>` +
-                 `Shallow Climb: ${shallowClimbRate}%`;
-        }
-      },
-      grid: {
-        left: '10%',
-        right: '10%'
-      },
-      xAxis: {
-        name: 'Auto',
-        type: 'value'
-      },
-      yAxis: {
-        name: 'Teleop',
-        type: 'value'
-      },
-      series: [{
-        type: 'scatter',
-        symbolSize: function(data) {
-          return (data[2] * 20) + 20; // Size based on climb success rate
-        },
-        data: Object.entries(teamData).map(([team, data]: [string, any]) => [
-          average((data as any).autoScores),
-          average((data as any).teleopScores),
-          (data as any).climbSuccess / (data as any).matchCount,
-          team // Store team number for tooltip
-        ])
-      }]
-    };
-
     chart.setOption(trendOption);
-    scatter.setOption(scatterOption);
 
     const handleResize = () => {
       chart.resize();
-      scatter.resize();
     };
 
     window.addEventListener('resize', handleResize);
 
     return () => {
       chart.dispose();
-      scatter.dispose();
       window.removeEventListener('resize', handleResize);
     };
   }, [records]);
@@ -160,7 +113,6 @@ export function TeamComparisonChart({ records }) {
   return (
     <div className="space-y-8">
       <div ref={chartRef} style={{ width: '100%', height: '400px' }} />
-      <div ref={scatterRef} style={{ width: '100%', height: '400px' }} />
     </div>
   );
 }

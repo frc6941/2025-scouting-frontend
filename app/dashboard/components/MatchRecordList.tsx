@@ -348,7 +348,8 @@ export function MatchRecordList({ teamNumber, matchType }) {
     const autoScore = calculateScore(team.autonomous, true);
     const teleopScore = calculateScore(team.teleop, false);
     const endGameScore = calculateEndGameScore(team.endAndAfterGame.stopStatus);
-    
+    const totalTeleopScore = teleopScore + endGameScore;
+
     return (
       <div key={team.id} className="border-b last:border-b-0 py-4">
         <div className="flex justify-between items-center mb-2">
@@ -381,7 +382,7 @@ export function MatchRecordList({ teamNumber, matchType }) {
           </div>
           <div>
             <p className="text-sm text-gray-600">Teleop Score</p>
-            <p className="font-medium">{teleopScore}</p>
+            <p className="font-medium">{totalTeleopScore}</p>
           </div>
           <div>
             <p className="text-sm text-gray-600">End Game</p>

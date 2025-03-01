@@ -4,6 +4,7 @@ export function TeamStatsModal({ team }) {
   const autoScore = calculateScore(team.autonomous, true);
   const teleopScore = calculateScore(team.teleop, false);
   const endGameScore = calculateEndGameScore(team.endAndAfterGame.stopStatus);
+  const totalTeleopScore = teleopScore + endGameScore;
 
   return (
     <div className="space-y-6">
@@ -14,11 +15,11 @@ export function TeamStatsModal({ team }) {
         </div>
         <div>
           <p className="text-sm text-gray-600">Teleop Score</p>
-          <p className="font-medium">{teleopScore}</p>
+          <p className="font-medium">{totalTeleopScore}</p>
         </div>
         <div>
-          <p className="text-sm text-gray-600">End Game</p>
-          <p className="font-medium">{team.endAndAfterGame.stopStatus}</p>
+          <p className="text-sm text-gray-600">Total Score</p>
+          <p className="font-medium">{autoScore + totalTeleopScore}</p>
         </div>
       </div>
       {team.endAndAfterGame.comments && (
