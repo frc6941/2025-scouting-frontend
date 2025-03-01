@@ -62,7 +62,7 @@ export default function NavBar() {
   useEffect(() => {
     // Redirect to login if not logged in
     if (!isLoggedIn && window.location.pathname !== '/auth/feishu') {
-      window.location.assign(`https://accounts.feishu.cn/open-apis/authen/v1/authorize?client_id=cli_a71a0cebd21a900d&redirect_uri=${process.env.NEXT_PUBLIC_API_URL}/auth/feishu`);
+      window.location.assign(`https://accounts.feishu.cn/open-apis/authen/v1/authorize?client_id=cli_a71a0cebd21a900d&redirect_uri=${process.env.NEXT_PUBLIC_FEISHU_REDIRECT_URI}`);
       return;
     }
 
