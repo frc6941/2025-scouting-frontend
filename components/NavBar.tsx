@@ -140,7 +140,7 @@ export default function NavBar() {
 
           <div className="flex items-center">
             {userInfo?.avatarUrl && <img src={userInfo?.avatarUrl} onClick={()=>{
-              window.location.assign(`https://accounts.feishu.cn/open-apis/authen/v1/authorize?client_id=cli_a71a0cebd21a900d&redirect_uri=${process.env.NEXT_PUBLIC_API_URL}/auth/feishu`);
+              window.location.assign(`https://accounts.feishu.cn/open-apis/authen/v1/authorize?client_id=cli_a71a0cebd21a900d&redirect_uri=${process.env.NEXT_PUBLIC_FEISHU_REDIRECT_URI}`);
             }} alt="IronPulse" width={45} height={45} className="rounded-full" />}
           </div>
         </div>
