@@ -124,10 +124,6 @@ function MatchStatsModal({ match, onClose }) {
                 <p className="text-sm text-gray-600">Total Score</p>
                 <p className="text-2xl font-bold">{(stats.totalAutoScore + stats.totalTeleopScore).toFixed(1)}</p>
               </div>
-              <div className="bg-default-50 p-4 rounded-lg">
-                <p className="text-sm text-gray-600">Climb Success</p>
-                <p className="text-2xl font-bold">{stats.climbSuccessRate.toFixed(1)}%</p>
-              </div>
             </div>
           </div>
 
