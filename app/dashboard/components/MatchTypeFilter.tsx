@@ -15,7 +15,10 @@ export function MatchTypeFilter({ selectedType, onTypeSelect }) {
       label="Match Type"
       placeholder="Filter by match type"
       selectedKeys={selectedType ? new Set([selectedType]) : new Set()}
-      onSelectionChange={(keys) => onTypeSelect([...keys][0])}
+      onSelectionChange={(keys) => {
+        const selected = [...keys][0];
+        onTypeSelect(selected || null);
+      }}
       className="min-w-[200px]"
     >
       {Object.entries(MatchType).map(([key, value]) => (

@@ -140,10 +140,17 @@ export function TeamPerformanceChart({ records }) {
         ],
         top: 50,
         padding: [5, 10],
-        itemGap: 20,
+        itemGap: 10,
+        textStyle: {
+          fontSize: 10
+        },
+        type: 'scroll',
+        pageButtonItemGap: 5,
+        pageButtonGap: 5,
+        pageIconSize: 12
       },
       grid: {
-        top: 140,
+        top: 120,
         left: '3%',
         right: '4%',
         bottom: '3%',
@@ -239,10 +246,17 @@ export function TeamPerformanceChart({ records }) {
         ],
         top: 50,
         padding: [5, 10],
-        itemGap: 20,
+        itemGap: 10,
+        textStyle: {
+          fontSize: 10
+        },
+        type: 'scroll',
+        pageButtonItemGap: 5,
+        pageButtonGap: 5,
+        pageIconSize: 12
       },
       grid: {
-        top: 140,
+        top: 120,
         left: '3%',
         right: '4%',
         bottom: '3%',
@@ -393,10 +407,10 @@ export function TeamPerformanceChart({ records }) {
   }, [records]);
 
   return (
-    <div className="space-y-8 pt-8">
-      <div ref={autoChartRef} style={{ width: '100%', height: '400px' }} />
-      <div ref={teleopChartRef} style={{ width: '100%', height: '400px' }} />
-      <div ref={totalScoreChartRef} style={{ width: '100%', height: '400px' }} />
+    <div className="space-y-6 pt-4">
+      <div ref={autoChartRef} style={{ width: '100%', height: '350px' }} className="min-h-[300px]" />
+      <div ref={teleopChartRef} style={{ width: '100%', height: '350px' }} className="min-h-[300px]" />
+      <div ref={totalScoreChartRef} style={{ width: '100%', height: '350px' }} className="min-h-[300px]" />
     </div>
   );
 }

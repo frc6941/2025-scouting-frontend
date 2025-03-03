@@ -65,12 +65,19 @@ export function TeamComparisonChart({ records }) {
       legend: {
         data: Object.keys(teamData).map(team => `Team ${team}`),
         top: 30,
-        type: 'scroll'
+        type: 'scroll',
+        textStyle: {
+          fontSize: 10
+        },
+        pageButtonItemGap: 5,
+        pageButtonGap: 5,
+        pageIconSize: 12
       },
       grid: {
-        left: '3%',
-        right: '4%',
-        bottom: '3%',
+        left: '10%',
+        right: '5%',
+        bottom: '15%',
+        top: '30%',
         containLabel: true
       },
       xAxis: {
@@ -111,8 +118,8 @@ export function TeamComparisonChart({ records }) {
   }, [records]);
 
   return (
-    <div className="space-y-8">
-      <div ref={chartRef} style={{ width: '100%', height: '400px' }} />
+    <div className="space-y-4">
+      <div ref={chartRef} style={{ width: '100%', height: '350px' }} className="min-h-[300px]" />
     </div>
   );
 }

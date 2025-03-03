@@ -40,10 +40,10 @@ export default function DashboardPage() {
   return (
     <main className="min-h-screen py-8">
       <div className="container mx-auto px-4 max-w-7xl">
-        <div className="flex flex-col gap-8">
+        <div className="flex flex-col gap-6">
           {/* Filters Section */}
-          <Card className="p-6">
-            <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+          <Card className="p-4 sm:p-6">
+            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
               <TeamSelector 
                 selectedTeam={selectedTeam} 
                 onTeamSelect={setSelectedTeam} 

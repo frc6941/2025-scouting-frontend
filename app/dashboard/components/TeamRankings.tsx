@@ -152,8 +152,8 @@ export function TeamRankings({ matchRecords }: { matchRecords: MatchRecord[] }) 
         </Select>
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="w-full">
+      <div className="overflow-x-auto -mx-4 sm:mx-0">
+        <table className="min-w-full divide-y divide-gray-200">
           <thead>
             <tr className="border-b">
               <th className="text-left py-3 px-4">Rank</th>
