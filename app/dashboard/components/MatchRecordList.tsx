@@ -345,7 +345,7 @@ export function MatchRecordList({ teamNumber, matchType }) {
     const teleopScore = calculateScore(team.teleop, false);
     const endGameScore = calculateEndGameScore(team.endAndAfterGame.stopStatus);
     const totalTeleopScore = teleopScore + endGameScore;
-
+    
     return (
       <div key={team.id} className="border-b last:border-b-0 py-4">
         <div className="flex justify-between items-center mb-2">
@@ -362,6 +362,11 @@ export function MatchRecordList({ teamNumber, matchType }) {
             variant="light"
             size="sm"
             onPress={() => {
+              setSelectedMatch({ 
+                matchNumber, 
+                matchType: "",
+                teams: []
+              });
               setSelectedTeam(team);
               setShowTeamStats(true);
               setShowStats(false);
@@ -490,76 +495,75 @@ export function MatchRecordList({ teamNumber, matchType }) {
           setIsModalOpen(false);
           setSelectedMatch(null);
           setShowStats(false);
-          setSelectedTeam(null);
           setShowTeamStats(false);
+          setSelectedTeam(null);
         }}
-        size="2xl"
-        className="mx-2 mb-[5vh] sm:mx-4 max-h-[95vh] mt-[2vh] sm:mt-[5vh]"
+        size="3xl"
       >
-        <ModalContent className="p-3 sm:p-6">
-          {selectedMatch && (
-            showStats ? (
-              <MatchStatsModal 
-                match={selectedMatch} 
-                onClose={() => {
-                  setIsModalOpen(false);
-                  setSelectedMatch(null);
-                  setShowStats(false);
-                }} 
-              />
-            ) : showTeamStats && selectedTeam ? (
-              <>
-                <ModalHeader className="border-b pb-4">
-                  <div className="flex justify-between items-center">
-                    <h2 className="text-xl sm:text-2xl font-bold">
-                      Team {selectedTeam.team} Stats - Match {selectedMatch.matchNumber}
-                    </h2>
-                    <Button
-                      color="primary"
-                      variant="light"
-                      onPress={() => setShowTeamStats(false)}
-                    >
-                      Back
-                    </Button>
-                  </div>
-                </ModalHeader>
-                <ModalBody className="py-4 sm:py-6 overflow-y-auto">
-                  <TeamStatsModal team={selectedTeam} />
-                </ModalBody>
-              </>
-            ) : (
-              <>
-                <ModalHeader className="border-b pb-4">
+        <ModalContent className="p-0">
+          {showStats && selectedMatch ? (
+            <MatchStatsModal 
+              match={selectedMatch} 
+              onClose={() => {
+                setShowStats(false);
+                setIsModalOpen(false);
+              }} 
+            />
+          ) : showTeamStats && selectedTeam ? (
+            <>
+              <ModalHeader className="border-b pb-4">
+                <div className="flex justify-between items-center">
                   <h2 className="text-xl sm:text-2xl font-bold">
-                    Match {selectedMatch.matchNumber} Details
+                    Team {selectedTeam.team} Stats {selectedMatch && `- Match ${selectedMatch.matchNumber}`}
                   </h2>
-                </ModalHeader>
-                <ModalBody className="py-4 sm:py-6 overflow-y-auto">
-                  <div className="space-y-6">
-                    <div className="grid grid-cols-1 gap-6">
-                      <div>
-                        <h3 className="text-lg font-semibold mb-4 text-red-700">Red Alliance</h3>
-                        {selectedMatch.teams
-                          .filter(t => t.alliance === 'Red')
-                          .map(team => renderTeamDetails(team, selectedMatch.matchNumber))}
-                      </div>
-                      <div>
-                        <h3 className="text-lg font-semibold mb-4 text-blue-700">Blue Alliance</h3>
-                        {selectedMatch.teams
-                          .filter(t => t.alliance === 'Blue')
-                          .map(team => renderTeamDetails(team, selectedMatch.matchNumber))}
-                      </div>
-                    </div>
-                  </div>
-                </ModalBody>
-                <ModalFooter>
-                  <Button color="primary" variant="light" onPress={() => setIsModalOpen(false)}>
+                  <Button
+                    color="primary"
+                    variant="light"
+                    onPress={() => {
+                      setShowTeamStats(false);
+                      setIsModalOpen(false);
+                    }}
+                  >
                     Close
                   </Button>
-                </ModalFooter>
-              </>
-            )
-          )}
+                </div>
+              </ModalHeader>
+              <ModalBody className="py-4 sm:py-6 overflow-y-auto">
+                <TeamStatsModal team={selectedTeam} />
+              </ModalBody>
+            </>
+          ) : selectedMatch && selectedMatch.teams ? (
+            <>
+              <ModalHeader className="border-b pb-4">
+                <h2 className="text-xl sm:text-2xl font-bold">
+                  Match {selectedMatch.matchNumber} Details
+                </h2>
+              </ModalHeader>
+              <ModalBody className="py-4 sm:py-6 overflow-y-auto">
+                <div className="space-y-6">
+                  <div className="grid grid-cols-1 gap-6">
+                    <div>
+                      <h3 className="text-lg font-semibold mb-4 text-red-700">Red Alliance</h3>
+                      {selectedMatch.teams
+                        .filter(t => t.alliance === 'Red')
+                        .map(team => renderTeamDetails(team, selectedMatch.matchNumber))}
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold mb-4 text-blue-700">Blue Alliance</h3>
+                      {selectedMatch.teams
+                        .filter(t => t.alliance === 'Blue')
+                        .map(team => renderTeamDetails(team, selectedMatch.matchNumber))}
+                    </div>
+                  </div>
+                </div>
+              </ModalBody>
+              <ModalFooter>
+                <Button color="primary" variant="light" onPress={() => setIsModalOpen(false)}>
+                  Close
+                </Button>
+              </ModalFooter>
+            </>
+          ) : null}
         </ModalContent>
       </Modal>
     </>
