@@ -169,6 +169,12 @@ export default function NavBar() {
                   <span>{item.name}</span>
                 </Link>
               ))}
+              
+              {/* Add theme switcher to mobile menu */}
+              <div className="flex items-center gap-3 w-full px-4 py-3 mt-2">
+                <span className="text-gray-600 dark:text-zinc-400">Theme:</span>
+                <ThemeSwitcher />
+              </div>
             </div>
           </div>
         )}
