@@ -40,6 +40,9 @@ export function PitScoutingView({ teamNumber }) {
 
   if (!teamNumber || !data) return null;
 
+  // Ensure capabilities exists with default empty object
+  const capabilities = data.capabilities || {};
+
   return (
     <Card className="p-4 sm:p-6">
       <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">
@@ -52,7 +55,7 @@ export function PitScoutingView({ teamNumber }) {
           <h3 className="text-lg font-semibold mb-3">能放 Coral</h3>
           <div className="flex flex-wrap gap-2">
             {['l1', 'l2', 'l3', 'l4'].map((level) => (
-              data.capabilities[level] && (
+              capabilities[level] && (
                 <Chip key={level} color="primary" size="sm">
                   {level.toUpperCase()}
                 </Chip>
@@ -65,7 +68,7 @@ export function PitScoutingView({ teamNumber }) {
           <h3 className="text-lg font-semibold mb-3">能放 Algae</h3>
           <div className="flex flex-wrap gap-2">
             {['processor', 'barge'].map((type) => (
-              data.capabilities[type] && (
+              capabilities[type] && (
                 <Chip key={type} color="primary" size="sm">
                   {type.charAt(0).toUpperCase() + type.slice(1)}
                 </Chip>
@@ -78,7 +81,7 @@ export function PitScoutingView({ teamNumber }) {
           <h3 className="text-lg font-semibold mb-3">爬升</h3>
           <div className="flex flex-wrap gap-2">
             {['noClimb', 'shallowClimb', 'deepClimb'].map((climb) => (
-              data.capabilities[climb] && (
+              capabilities[climb] && (
                 <Chip key={climb} color="primary" size="sm">
                   {climb === 'noClimb' ? '不能爬' : 
                    climb === 'shallowClimb' ? 'Shallow Climb' : 'Deep Climb'}

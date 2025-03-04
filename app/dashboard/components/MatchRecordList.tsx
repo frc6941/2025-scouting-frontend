@@ -101,37 +101,56 @@ function calculateMatchStats(teams) {
   return stats;
 }
 
+// Fix scrolling issues in the MatchStatsModal component
 function MatchStatsModal({ match, onClose }) {
   const stats = calculateMatchStats(match.teams);
   
   return (
-    <ModalContent className="p-3 sm:p-6">
-      <ModalHeader className="border-b pb-4">
-        <h2 className="text-xl sm:text-2xl font-bold">
-          Match {match.matchNumber} Statistics
-        </h2>
+    <div className="flex flex-col h-full">
+      <ModalHeader className="border-b pb-4 sticky top-0 bg-white dark:bg-zinc-900 z-10">
+        <div className="flex justify-between items-center">
+          <h2 className="text-lg sm:text-xl font-bold">
+            Match {match.matchNumber} Statistics
+          </h2>
+          <Button color="primary" variant="light" size="sm" onPress={onClose}>
+            Close
+          </Button>
+        </div>
       </ModalHeader>
-      <ModalBody className="py-4 sm:py-6 overflow-y-auto">
-        <div className="space-y-8">
+      
+      <ModalBody className="py-4 overflow-y-auto flex-grow">
+        <div className="space-y-6">
           {/* Overall Scores */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Overall Performance</h3>
+            <h3 className="text-lg font-semibold mb-4">Overall Scores</h3>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               <div className="bg-default-50 p-4 rounded-lg">
                 <p className="text-sm text-gray-600">Avg Auto Score</p>
-                <p className="text-2xl font-bold">{stats.avgAutoScore.toFixed(1)}</p>
+                <p className="text-xl font-bold">{stats.avgAutoScore.toFixed(1)}</p>
               </div>
               <div className="bg-default-50 p-4 rounded-lg">
                 <p className="text-sm text-gray-600">Avg Teleop Score</p>
-                <p className="text-2xl font-bold">{stats.avgTeleopScore.toFixed(1)}</p>
+                <p className="text-xl font-bold">{stats.avgTeleopScore.toFixed(1)}</p>
               </div>
               <div className="bg-default-50 p-4 rounded-lg">
-                <p className="text-sm text-gray-600">Total Score</p>
-                <p className="text-2xl font-bold">{(stats.totalAutoScore + stats.totalTeleopScore).toFixed(1)}</p>
+                <p className="text-sm text-gray-600">Total Auto Score</p>
+                <p className="text-xl font-bold">{stats.totalAutoScore}</p>
+              </div>
+              <div className="bg-default-50 p-4 rounded-lg">
+                <p className="text-sm text-gray-600">Total Teleop Score</p>
+                <p className="text-xl font-bold">{stats.totalTeleopScore}</p>
               </div>
             </div>
           </div>
-
+          
+          {/* Climb Success Rate */}
+          <div>
+            <h3 className="text-lg font-semibold mb-4">Climb Success Rate</h3>
+            <div className="bg-default-50 p-4 rounded-lg">
+              <p className="text-xl font-bold">{stats.climbSuccessRate.toFixed(1)}%</p>
+            </div>
+          </div>
+          
           {/* Coral Level Distribution */}
           <div>
             <h3 className="text-lg font-semibold mb-4">Coral Level Distribution</h3>
@@ -162,17 +181,12 @@ function MatchStatsModal({ match, onClose }) {
           </div>
         </div>
       </ModalBody>
-      <ModalFooter>
-        <Button color="primary" variant="light" onPress={onClose}>
-          Close
-        </Button>
-      </ModalFooter>
-    </ModalContent>
+    </div>
   );
 }
 
-// Update the TeamStatsModal component to include an edit button and functionality
-function TeamStatsModal({ team }) {
+// Update the TeamStatsModal component to include team number and match number fields
+function TeamStatsModal({ team, matchNumber }) {
   const autoScore = calculateScore(team.autonomous, true);
   const teleopScore = calculateScore(team.teleop, false);
   const endGameScore = calculateEndGameScore(team.endAndAfterGame.stopStatus);
@@ -182,10 +196,12 @@ function TeamStatsModal({ team }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editedTeam, setEditedTeam] = useState({...team});
   
-  // Handle simple field changes
+  // Handle field changes
   const handleChange = (section, field, value) => {
     setEditedTeam(prev => {
-      if (section === 'autonomous') {
+      if (section === 'root') {
+        return { ...prev, [field]: value };
+      } else if (section === 'autonomous') {
         return {
           ...prev,
           autonomous: {
@@ -287,7 +303,7 @@ function TeamStatsModal({ team }) {
   };
 
   return (
-    <div className="max-h-[70vh] overflow-y-auto pr-2 -mr-2">
+    <div className="overflow-y-auto">
       {/* Add Edit/Save buttons at the top */}
       <div className="flex justify-end mb-4 sticky top-0 bg-white dark:bg-zinc-900 z-10 py-2">
         {isEditing ? (
@@ -298,7 +314,7 @@ function TeamStatsModal({ team }) {
               className="mr-2"
               onPress={handleSave}
             >
-              Save Changes
+              Save
             </Button>
             <Button 
               color="danger" 
@@ -317,9 +333,43 @@ function TeamStatsModal({ team }) {
             size="sm"
             onPress={() => setIsEditing(true)}
           >
-            Edit Record
+            Edit
           </Button>
         )}
+      </div>
+      
+      {/* Team Number and Match Number fields */}
+      <div className="grid grid-cols-2 gap-3">
+        <div className="bg-default-50 p-3 rounded-lg">
+          <div className="flex justify-between items-center">
+            <span>Team Number</span>
+            {isEditing ? (
+              <input
+                type="number"
+                value={editedTeam.team}
+                onChange={(e) => handleChange('root', 'team', parseInt(e.target.value) || 0)}
+                className="w-24 p-1 border rounded"
+              />
+            ) : (
+              <span className="font-medium">{team.team}</span>
+            )}
+          </div>
+        </div>
+        <div className="bg-default-50 p-3 rounded-lg">
+          <div className="flex justify-between items-center">
+            <span>Match Number</span>
+            {isEditing ? (
+              <input
+                type="number"
+                value={editedTeam.matchNumber}
+                onChange={(e) => handleChange('root', 'matchNumber', parseInt(e.target.value) || 0)}
+                className="w-24 p-1 border rounded"
+              />
+            ) : (
+              <span className="font-medium">{team.matchNumber}</span>
+            )}
+          </div>
+        </div>
       </div>
       
       {/* Auto Stats */}
@@ -611,6 +661,16 @@ function TeamStatsModal({ team }) {
   );
 }
 
+// Add this helper function to calculate alliance total score
+const calculateAllianceScore = (teams) => {
+  return teams.reduce((total, team) => {
+    const autoScore = calculateScore(team.autonomous, true);
+    const teleopScore = calculateScore(team.teleop, false);
+    const endGameScore = calculateEndGameScore(team.endAndAfterGame.stopStatus);
+    return total + autoScore + teleopScore + endGameScore;
+  }, 0);
+};
+
 export function MatchRecordList({ teamNumber, matchType }) {
   const [records, setRecords] = useState<GroupedMatchRecord[] | MatchRecord[]>([]);
   const [selectedMatch, setSelectedMatch] = useState<GroupedMatchRecord | null>(null);
@@ -718,12 +778,10 @@ export function MatchRecordList({ teamNumber, matchType }) {
             variant="light"
             size="sm"
             onPress={() => {
-              setSelectedMatch({ 
-                matchNumber, 
-                matchType: "",
-                teams: []
+              setSelectedTeam({
+                ...team,
+                matchNumber: matchNumber
               });
-              setSelectedTeam(team);
               setShowTeamStats(true);
               setShowStats(false);
               setIsModalOpen(true);
@@ -780,12 +838,9 @@ export function MatchRecordList({ teamNumber, matchType }) {
           {(records as GroupedMatchRecord[])
             .filter(match => !teamNumber || match.teams.some(t => t.team === teamNumber))
             .map((match) => (
-              <div key={match.matchNumber} className="p-4 border rounded-lg bg-default-50 hover:bg-default-100 transition-colors">
-                <div className="flex justify-between items-center mb-4">
-                  <div 
-                    className="flex items-center gap-2 cursor-pointer"
-                    onClick={() => toggleMatchExpand(match.matchNumber)}
-                  >
+              <div key={match.matchNumber} className="p-3 border rounded-lg bg-default-50 hover:bg-default-100 transition-colors">
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-2">
+                  <div className="flex items-center gap-2 cursor-pointer mb-2 sm:mb-0" onClick={() => toggleMatchExpand(match.matchNumber)}>
                     <h3 className="text-lg font-semibold">Match {match.matchNumber}</h3>
                     {expandedMatches.includes(match.matchNumber) ? (
                       <ChevronUp className="w-5 h-5" />
@@ -793,29 +848,49 @@ export function MatchRecordList({ teamNumber, matchType }) {
                       <ChevronDown className="w-5 h-5" />
                     )}
                   </div>
-                  <div className="flex gap-2">
-                    <Button 
-                      color="primary"
-                      variant="light"
-                      onPress={() => {
-                        setSelectedMatch(match);
-                        setShowStats(true);
-                        setIsModalOpen(true);
-                      }}
-                    >
-                      View Stats
-                    </Button>
-                    <Button 
-                      color="primary"
-                      variant="light"
-                      onPress={() => {
-                        setSelectedMatch(match);
-                        setShowStats(false);
-                        setIsModalOpen(true);
-                      }}
-                    >
-                      View Details
-                    </Button>
+                  
+                  <div className="flex flex-row justify-between items-center gap-2 flex-wrap">
+                    {/* Compact alliance score display */}
+                    <div className="flex items-center">
+                      <div className="flex items-center text-xs bg-red-100 dark:bg-red-900/30 px-1 py-0.5 rounded-md">
+                        <div className="w-1.5 h-1.5 bg-red-600 rounded-full mr-0.5"></div>
+                        <span className="font-medium">{calculateAllianceScore(match.teams.filter(t => t.alliance === 'Red'))}</span>
+                      </div>
+                      <span className="text-gray-500 mx-0.5">vs</span>
+                      <div className="flex items-center text-xs bg-blue-100 dark:bg-blue-900/30 px-1 py-0.5 rounded-md">
+                        <div className="w-1.5 h-1.5 bg-blue-600 rounded-full mr-0.5"></div>
+                        <span className="font-medium">{calculateAllianceScore(match.teams.filter(t => t.alliance === 'Blue'))}</span>
+                      </div>
+                    </div>
+                    
+                    <div className="flex gap-1 flex-shrink-0">
+                      <Button
+                        color="primary"
+                        variant="light"
+                        size="sm"
+                        className="px-2 py-1 text-xs"
+                        onPress={() => {
+                          setSelectedMatch(match);
+                          setShowStats(true);
+                          setIsModalOpen(true);
+                        }}
+                      >
+                        Stats
+                      </Button>
+                      <Button 
+                        color="primary"
+                        variant="light"
+                        size="sm"
+                        className="px-2 py-1 text-xs"
+                        onPress={() => {
+                          setSelectedMatch(match);
+                          setShowStats(false);
+                          setIsModalOpen(true);
+                        }}
+                      >
+                        Details
+                      </Button>
+                    </div>
                   </div>
                 </div>
                 
@@ -868,9 +943,11 @@ export function MatchRecordList({ teamNumber, matchType }) {
           setShowTeamStats(false);
           setSelectedTeam(null);
         }}
-        size="3xl"
+        size="full" 
+        scrollBehavior="inside"
+        className="sm:!max-w-3xl"
       >
-        <ModalContent className="p-0">
+        <ModalContent className="p-0 h-[100vh] sm:h-auto sm:max-h-[90vh] flex flex-col">
           {showStats && selectedMatch ? (
             <MatchStatsModal 
               match={selectedMatch} 
@@ -881,14 +958,15 @@ export function MatchRecordList({ teamNumber, matchType }) {
             />
           ) : showTeamStats && selectedTeam ? (
             <>
-              <ModalHeader className="border-b pb-4">
+              <ModalHeader className="border-b pb-4 sticky top-0 bg-white dark:bg-zinc-900 z-10">
                 <div className="flex justify-between items-center">
-                  <h2 className="text-xl sm:text-2xl font-bold">
-                    Team {selectedTeam.team} Stats {selectedMatch && `- Match ${selectedMatch.matchNumber}`}
+                  <h2 className="text-lg sm:text-xl font-bold truncate">
+                    Team {selectedTeam.team} Stats {selectedTeam.matchNumber && `- Match ${selectedTeam.matchNumber}`}
                   </h2>
                   <Button
                     color="primary"
                     variant="light"
+                    size="sm"
                     onPress={() => {
                       setShowTeamStats(false);
                       setIsModalOpen(false);
@@ -898,18 +976,30 @@ export function MatchRecordList({ teamNumber, matchType }) {
                   </Button>
                 </div>
               </ModalHeader>
-              <ModalBody className="py-4 sm:py-6 max-h-[70vh]">
-                <TeamStatsModal team={selectedTeam} />
+              <ModalBody className="py-4 overflow-y-auto flex-grow">
+                <TeamStatsModal team={selectedTeam} matchNumber={selectedTeam.matchNumber} />
               </ModalBody>
             </>
           ) : selectedMatch && selectedMatch.teams ? (
             <>
-              <ModalHeader className="border-b pb-4">
-                <h2 className="text-xl sm:text-2xl font-bold">
-                  Match {selectedMatch.matchNumber} Details
-                </h2>
+              <ModalHeader className="border-b pb-4 sticky top-0 bg-white dark:bg-zinc-900 z-10">
+                <div className="flex justify-between items-center">
+                  <h2 className="text-lg sm:text-xl font-bold">
+                    Match {selectedMatch.matchNumber} Details
+                  </h2>
+                  <Button
+                    color="primary"
+                    variant="light"
+                    size="sm"
+                    onPress={() => {
+                      setIsModalOpen(false);
+                    }}
+                  >
+                    Close
+                  </Button>
+                </div>
               </ModalHeader>
-              <ModalBody className="py-4 sm:py-6 overflow-y-auto">
+              <ModalBody className="py-4 overflow-y-auto flex-grow">
                 <div className="space-y-6">
                   <div className="grid grid-cols-1 gap-6">
                     <div>

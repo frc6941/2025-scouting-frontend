@@ -26,6 +26,14 @@ const Step5 = () => {
     router.push("/scouting/step4");
   };
 
+  const endGameStates = [
+    { key: StopStatus.PARK, label: "Park" },
+    { key: StopStatus.DEEP, label: "Deep Climb" },
+    { key: StopStatus.SHALLOW, label: "Shallow Climb" },
+    { key: StopStatus.FAILED, label: "Failed" },
+    { key: StopStatus.PLAYED_DEFENSE, label: "Played Defense" },
+  ];
+
   const handleSubmit = async () => {
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/scouting/record`, {
       method: "POST",
@@ -150,7 +158,8 @@ const Step5 = () => {
             <Radio value="Deep Climb">Deep Climb (12 pts)</Radio>
             <Radio value="Shallow Climb">Shallow Climb (6 pts)</Radio>
             <Radio value="Park">Park (2 pts)</Radio>
-            <Radio value="None">None (0 pts)</Radio>
+            <Radio value="Played Defense">Played Defense (1 pt)</Radio>
+            <Radio value="Failed">Failed (0 pts)</Radio>
           </RadioGroup>
           
           <div className="mt-4">
@@ -181,6 +190,7 @@ const Step5 = () => {
                 id="rankingPoint"
                 type="number"
                 min="0"
+                max="3"
                 value={formData.endAndAfterGame.rankingPoint || ''}
                 onChange={handleNumberChange('rankingPoint')}
                 className="w-full"

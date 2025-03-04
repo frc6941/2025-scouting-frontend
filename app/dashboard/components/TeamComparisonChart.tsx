@@ -119,7 +119,11 @@ export function TeamComparisonChart({ records }) {
 
   return (
     <div className="space-y-4">
-      <div ref={chartRef} style={{ width: '100%', height: '350px' }} className="min-h-[300px]" />
+      <div 
+        ref={chartRef} 
+        style={{ width: '100%', height: '700px' }} 
+        className="min-h-[700px]" 
+      />
     </div>
   );
 }
