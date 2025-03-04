@@ -38,7 +38,7 @@ export function calculateScore(phase: Phase | null | undefined, isAuto: boolean 
     (phase.algaeCount.processor || 0) * 6;
     
   // Add 2 points for leaving starting zone in auto phase
-  const leftStartingZonePoints = isAuto && phase.leftStartingZone ? 2 : 0;
+  const leftStartingZonePoints = isAuto && phase.leftStartingZone ? 3 : 0;
 
   return coralScore + algaeScore + leftStartingZonePoints;
 }
@@ -51,6 +51,10 @@ export function calculateEndGameScore(status: string): number {
       return 6;
     case 'Park':
       return 2;
+    case 'Failed':
+      return 2;
+    case 'Played Defense':
+      return 0;
     default:
       return 0;
   }

@@ -158,8 +158,8 @@ const Step5 = () => {
             <Radio value="Deep Climb">Deep Climb (12 pts)</Radio>
             <Radio value="Shallow Climb">Shallow Climb (6 pts)</Radio>
             <Radio value="Park">Park (2 pts)</Radio>
-            <Radio value="Played Defense">Played Defense (1 pt)</Radio>
-            <Radio value="Failed">Failed (0 pts)</Radio>
+            <Radio value="Failed">Failed (2 pts)</Radio>
+            <Radio value="Played Defense">Played Defense (0 pts)</Radio>
           </RadioGroup>
           
           <div className="mt-4">
@@ -190,7 +190,7 @@ const Step5 = () => {
                 id="rankingPoint"
                 type="number"
                 min="0"
-                max="3"
+                max="6"
                 value={formData.endAndAfterGame.rankingPoint || ''}
                 onChange={handleNumberChange('rankingPoint')}
                 className="w-full"
