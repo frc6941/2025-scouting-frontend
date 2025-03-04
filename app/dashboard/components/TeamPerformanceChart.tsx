@@ -13,6 +13,7 @@ interface PerformanceData {
     l4: number[];
     processor: number[];
     net: number[];
+    leftZone: number[];
   };
   teleopScores: { 
     l1: number[]; 
@@ -47,7 +48,8 @@ export function TeamPerformanceChart({ records }) {
         l3: [],
         l4: [],
         processor: [],
-        net: []
+        net: [],
+        leftZone: []
       },
       teleopScores: {
         l1: [],
@@ -76,6 +78,7 @@ export function TeamPerformanceChart({ records }) {
       data.autoScores.l4.push((record.autonomous.coralCount.l4 || 0) * 7);
       data.autoScores.processor.push((record.autonomous.algaeCount.processor || 0) * 6);
       data.autoScores.net.push((record.autonomous.algaeCount.netShot || 0) * 4);
+      data.autoScores.leftZone.push(record.autonomous.leftStartingZone ? 2 : 0);
 
       const autoScore = calculateScore(record.autonomous, true);
       data.autoTotalScores.push(autoScore);
@@ -124,9 +127,16 @@ export function TeamPerformanceChart({ records }) {
           let total = 0;
           let tooltip = `Match ${params[0].axisValue}<br/>`;
           params.forEach(param => {
-            const points = parseInt(param.seriesName.match(/\((\d+)pts\)/)[1]);
-            const count = param.value / points;
-            tooltip += `${param.seriesName}: ${count} (${param.value} pts)<br/>`;
+            // Check if the series name contains points information
+            const pointsMatch = param.seriesName.match(/\((\d+)pts\)/);
+            if (pointsMatch) {
+              const points = parseInt(pointsMatch[1]);
+              const count = param.value / points;
+              tooltip += `${param.seriesName}: ${count} (${param.value} pts)<br/>`;
+            } else {
+              // Handle series without point values in the name (like 'Left Zone')
+              tooltip += `${param.seriesName}: ${param.value} pts<br/>`;
+            }
             total += param.value;
           });
           tooltip += `<br/><strong>Total: ${total} points</strong>`;
@@ -136,7 +146,7 @@ export function TeamPerformanceChart({ records }) {
       legend: {
         data: [
           'L1 (3pts)', 'L2 (4pts)', 'L3 (6pts)', 'L4 (7pts)',
-          'Processor (6pts)', 'Net (4pts)'
+          'Processor (6pts)', 'Net (4pts)', 'Left Zone'
         ],
         top: 50,
         padding: [5, 10],
@@ -200,6 +210,12 @@ export function TeamPerformanceChart({ records }) {
           type: 'bar',
           stack: 'total',
           data: data.autoScores.net
+        },
+        {
+          name: 'Left Zone',
+          type: 'bar',
+          stack: 'total',
+          data: data.autoScores.leftZone
         }
       ]
     };
@@ -227,12 +243,17 @@ export function TeamPerformanceChart({ records }) {
           let total = 0;
           let tooltip = `Match ${params[0].axisValue}<br/>`;
           params.forEach(param => {
-            if (param.seriesName.includes('pts')) {
-              const points = parseInt(param.seriesName.match(/\((\d+)pts\)/)[1]);
+            // Check if the series name contains points information
+            const pointsMatch = param.seriesName.match(/\((\d+)pts\)/);
+            if (pointsMatch) {
+              const points = parseInt(pointsMatch[1]);
               const count = param.value / points;
               tooltip += `${param.seriesName}: ${count} (${param.value} pts)<br/>`;
-              total += param.value;
+            } else {
+              // Handle series without point values in the name (like 'Left Zone')
+              tooltip += `${param.seriesName}: ${param.value} pts<br/>`;
             }
+            total += param.value;
           });
           tooltip += `<br/><strong>Total: ${total} points</strong>`;
           return tooltip;
@@ -405,6 +426,29 @@ export function TeamPerformanceChart({ records }) {
       window.removeEventListener('resize', handleResize);
     };
   }, [records]);
+
+  // Define CustomTooltip inside the component so it has access to records
+  const CustomTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      const record = records.find(r => `Match ${r.matchNumber}` === label);
+      const leftZonePoints = record?.autonomous.leftStartingZone ? 2 : 0;
+      
+      return (
+        <div className="bg-white dark:bg-zinc-900 p-4 rounded-lg shadow-lg border border-gray-200 dark:border-zinc-700">
+          <p className="font-semibold">{label}</p>
+          <div className="space-y-1 mt-2">
+            {payload.map((entry, index) => (
+              <p key={index} style={{ color: entry.color }}>
+                {entry.name}: {entry.value}
+                {entry.name === "Auto Score" && record?.autonomous.leftStartingZone && " (incl. 2pts for leaving zone)"}
+              </p>
+            ))}
+          </div>
+        </div>
+      );
+    }
+    return null;
+  };
 
   return (
     <div className="space-y-6 pt-4">

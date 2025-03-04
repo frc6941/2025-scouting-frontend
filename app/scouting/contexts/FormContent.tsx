@@ -16,6 +16,11 @@ export const FormProvider = ({ children }) => {
     endAndAfterGame: {
       stopStatus: "",
       comments: "",
+      climbingTime: 0,
+      rankingPoint: 0,
+      coopPoint: false,
+      autonomousMove: false,
+      teleopMove: false
     },
     teleop: {
       coralCount: {
@@ -33,6 +38,7 @@ export const FormProvider = ({ children }) => {
     },
     autonomous: {
       autoStart: 0,
+      leftStartingZone: false,
       coralCount: {
         l4: 0,
         l3: 0,

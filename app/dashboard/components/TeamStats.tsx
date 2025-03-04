@@ -64,6 +64,12 @@ interface AverageStats {
     deepPercentage: number;
     shallowPercentage: number;
   };
+  leftStartingZoneRate: number;
+  autoMoveRate: number;
+  teleopMoveRate: number;
+  avgClimbingTime: number;
+  avgRankingPoints: number;
+  coopPointRate: number;
 }
 
 export function TeamStats({ teamNumber, records }) {
@@ -96,7 +102,13 @@ export function TeamStats({ teamNumber, records }) {
         shallowSuccessful: 0,
         deepPercentage: 0,
         shallowPercentage: 0
-      }
+      },
+      leftStartingZoneRate: 0,
+      autoMoveRate: 0,
+      teleopMoveRate: 0,
+      avgClimbingTime: 0,
+      avgRankingPoints: 0,
+      coopPointRate: 0
     };
 
     // Calculate sums
@@ -139,6 +151,24 @@ export function TeamStats({ teamNumber, records }) {
       } else if (record.endAndAfterGame.stopStatus === "Shallow Climb") {
         stats.climbSuccess.shallowSuccessful++;
       }
+
+      // Left starting zone
+      stats.leftStartingZoneRate += record.autonomous.leftStartingZone ? 1 : 0;
+
+      // Auto movement
+      stats.autoMoveRate += record.endAndAfterGame.autonomousMove ? 1 : 0;
+
+      // Teleop movement
+      stats.teleopMoveRate += record.endAndAfterGame.teleopMove ? 1 : 0;
+
+      // Climbing time
+      stats.avgClimbingTime += record.endAndAfterGame.climbingTime || 0;
+
+      // Ranking points
+      stats.avgRankingPoints += record.endAndAfterGame.rankingPoint || 0;
+
+      // Coop point
+      stats.coopPointRate += record.endAndAfterGame.coopPoint ? 1 : 0;
     });
 
     // Calculate averages for all stats
@@ -154,6 +184,21 @@ export function TeamStats({ teamNumber, records }) {
     // Calculate climb success percentages
     stats.climbSuccess.deepPercentage = Number(((stats.climbSuccess.deepSuccessful / totalMatches) * 100).toFixed(1));
     stats.climbSuccess.shallowPercentage = Number(((stats.climbSuccess.shallowSuccessful / totalMatches) * 100).toFixed(1));
+
+    // Calculate left starting zone rate
+    stats.leftStartingZoneRate = Number(((stats.leftStartingZoneRate / totalMatches) * 100).toFixed(1));
+
+    // Calculate auto movement rate
+    stats.autoMoveRate = Number(((stats.autoMoveRate / totalMatches) * 100).toFixed(1));
+
+    // Calculate teleop movement rate
+    stats.teleopMoveRate = Number(((stats.teleopMoveRate / totalMatches) * 100).toFixed(1));
+
+    // Calculate average climbing time
+    stats.avgClimbingTime = Number((stats.avgClimbingTime / totalMatches).toFixed(1));
+
+    // Calculate coop point rate
+    stats.coopPointRate = Number(((stats.coopPointRate / totalMatches) * 100).toFixed(1));
 
     setStats(stats);
   }, [records]);
@@ -291,6 +336,44 @@ export function TeamStats({ teamNumber, records }) {
           </div>
         </div>
       </div>
+
+      {/* Add new section for movement and climbing */}
+      <section className="mt-8">
+        <h3 className="text-xl font-semibold mb-4">Movement & Climbing</h3>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div className="bg-default-50 p-4 rounded-lg">
+            <p className="text-sm text-gray-600">Left Starting Zone</p>
+            <p className="text-xl font-bold">{stats.leftStartingZoneRate}%</p>
+          </div>
+          <div className="bg-default-50 p-4 rounded-lg">
+            <p className="text-sm text-gray-600">Auto Movement</p>
+            <p className="text-xl font-bold">{stats.autoMoveRate}%</p>
+          </div>
+          <div className="bg-default-50 p-4 rounded-lg">
+            <p className="text-sm text-gray-600">Teleop Movement</p>
+            <p className="text-xl font-bold">{stats.teleopMoveRate}%</p>
+          </div>
+          <div className="bg-default-50 p-4 rounded-lg">
+            <p className="text-sm text-gray-600">Avg Climbing Time</p>
+            <p className="text-xl font-bold">{stats.avgClimbingTime.toFixed(1)}s</p>
+          </div>
+        </div>
+      </section>
+      
+      {/* Add new section for points */}
+      <section className="mt-8">
+        <h3 className="text-xl font-semibold mb-4">Points</h3>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="bg-default-50 p-4 rounded-lg">
+            <p className="text-sm text-gray-600">Ranking Points</p>
+            <p className="text-xl font-bold">{stats.avgRankingPoints.toFixed(1)}</p>
+          </div>
+          <div className="bg-default-50 p-4 rounded-lg">
+            <p className="text-sm text-gray-600">Coop Point Rate</p>
+            <p className="text-xl font-bold">{stats.coopPointRate}%</p>
+          </div>
+        </div>
+      </section>
     </Card>
   );
 } 

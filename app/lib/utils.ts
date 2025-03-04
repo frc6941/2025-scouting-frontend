@@ -15,6 +15,7 @@ interface AlgaeCount {
 interface Phase {
   coralCount: CoralCount;
   algaeCount: AlgaeCount;
+  leftStartingZone?: boolean;
 }
 
 export function calculateScore(phase: Phase | null | undefined, isAuto: boolean = false): number {
@@ -35,8 +36,11 @@ export function calculateScore(phase: Phase | null | undefined, isAuto: boolean 
   const algaeScore = 
     (phase.algaeCount.netShot || 0) * 4 +
     (phase.algaeCount.processor || 0) * 6;
+    
+  // Add 2 points for leaving starting zone in auto phase
+  const leftStartingZonePoints = isAuto && phase.leftStartingZone ? 2 : 0;
 
-  return coralScore + algaeScore;
+  return coralScore + algaeScore + leftStartingZonePoints;
 }
 
 export function calculateEndGameScore(status: string): number {

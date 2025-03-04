@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import { Card, Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@heroui/react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { calculateScore, calculateEndGameScore } from '@/app/lib/utils';
+import { toast } from "@/hooks/use-toast";
+import { getCookie } from 'cookies-next/client';
 
 interface MatchRecord {
   id: string;
@@ -25,6 +27,7 @@ interface MatchRecord {
       processor: number;
       dropOrMiss: number;
     };
+    leftStartingZone: boolean;
   };
   teleop: {
     coralCount: {
@@ -43,6 +46,8 @@ interface MatchRecord {
   endAndAfterGame: {
     stopStatus: string;
     comments: string;
+    rankingPoint: number;
+    coopPoint: boolean;
   };
 }
 
@@ -166,10 +171,157 @@ function MatchStatsModal({ match, onClose }) {
   );
 }
 
-// Add this new component for individual team stats
+// Update the TeamStatsModal component to include an edit button and functionality
 function TeamStatsModal({ team }) {
+  const autoScore = calculateScore(team.autonomous, true);
+  const teleopScore = calculateScore(team.teleop, false);
+  const endGameScore = calculateEndGameScore(team.endAndAfterGame.stopStatus);
+  const totalTeleopScore = teleopScore + endGameScore;
+  
+  // Add state for editing mode
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedTeam, setEditedTeam] = useState({...team});
+  
+  // Handle simple field changes
+  const handleChange = (section, field, value) => {
+    setEditedTeam(prev => {
+      if (section === 'autonomous') {
+        return {
+          ...prev,
+          autonomous: {
+            ...prev.autonomous,
+            [field]: value
+          }
+        };
+      } else if (section === 'teleop') {
+        return {
+          ...prev,
+          teleop: {
+            ...prev.teleop,
+            [field]: value
+          }
+        };
+      } else if (section === 'endAndAfterGame') {
+        return {
+          ...prev,
+          endAndAfterGame: {
+            ...prev.endAndAfterGame,
+            [field]: value
+          }
+        };
+      } else {
+        return {
+          ...prev,
+          [field]: value
+        };
+      }
+    });
+  };
+  
+  // Handle nested field changes (for coral and algae counts)
+  const handleNestedChange = (section, subsection, field, value) => {
+    setEditedTeam(prev => {
+      return {
+        ...prev,
+        [section]: {
+          ...prev[section],
+          [subsection]: {
+            ...prev[section][subsection],
+            [field]: value
+          }
+        }
+      };
+    });
+  };
+  
+  // Handle save/update
+  const handleSave = async () => {
+    console.log(editedTeam);
+    try {
+      // Check if API URL is defined
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || '';
+      if (!apiUrl) {
+        console.error("API URL is not defined");
+        toast({
+          title: "Configuration Error",
+          description: "API URL is not configured. Please check your environment variables.",
+          variant: "destructive"
+        });
+        return;
+      }
+      
+      const response = await fetch(`${apiUrl}/scouting/update/${editedTeam.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${getCookie('Authorization')}`
+        },
+        body: JSON.stringify(editedTeam)
+      });
+      
+      if (response.ok) {
+        toast({
+          title: "Success",
+          description: "Record updated successfully",
+          variant: "default"
+        });
+        setIsEditing(false);
+        // Refresh the page to show updated data
+        window.location.reload();
+      } else {
+        const errorData = await response.json();
+        toast({
+          title: "Error",
+          description: errorData.message || "Failed to update record",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      console.error("Error updating record:", error);
+      toast({
+        title: "Connection Error",
+        description: "Could not connect to the API server. Please check if the server is running.",
+        variant: "destructive"
+      });
+    }
+  };
+
   return (
-    <div className="space-y-6">
+    <div className="max-h-[70vh] overflow-y-auto pr-2 -mr-2">
+      {/* Add Edit/Save buttons at the top */}
+      <div className="flex justify-end mb-4 sticky top-0 bg-white dark:bg-zinc-900 z-10 py-2">
+        {isEditing ? (
+          <>
+            <Button 
+              color="success" 
+              size="sm" 
+              className="mr-2"
+              onPress={handleSave}
+            >
+              Save Changes
+            </Button>
+            <Button 
+              color="danger" 
+              size="sm"
+              onPress={() => {
+                setIsEditing(false);
+                setEditedTeam({...team}); // Reset to original
+              }}
+            >
+              Cancel
+            </Button>
+          </>
+        ) : (
+          <Button 
+            color="primary" 
+            size="sm"
+            onPress={() => setIsEditing(true)}
+          >
+            Edit Record
+          </Button>
+        )}
+      </div>
+      
       {/* Auto Stats */}
       <div>
         <h3 className="text-lg font-semibold mb-3">Autonomous</h3>
@@ -177,10 +329,20 @@ function TeamStatsModal({ team }) {
           <div className="bg-default-50 p-4 rounded-lg">
             <h4 className="text-md font-medium mb-2">Coral Counts</h4>
             <div className="space-y-2">
-              {Object.entries(team.autonomous.coralCount).map(([level, count]) => (
+              {Object.entries(isEditing ? editedTeam.autonomous.coralCount : team.autonomous.coralCount).map(([level, count]) => (
                 <div key={level} className="flex justify-between items-center">
                   <span className="capitalize">{level.replace(/([A-Z])/g, ' $1').trim()}</span>
-                  <span className="font-medium">{count as number}</span>
+                  {isEditing ? (
+                    <input
+                      type="number"
+                      min="0"
+                      value={count as number}
+                      onChange={(e) => handleNestedChange('autonomous', 'coralCount', level, parseInt(e.target.value) || 0)}
+                      className="w-16 p-1 border rounded"
+                    />
+                  ) : (
+                    <span className="font-medium">{count as number}</span>
+                  )}
                 </div>
               ))}
             </div>
@@ -188,19 +350,72 @@ function TeamStatsModal({ team }) {
           <div className="bg-default-50 p-4 rounded-lg">
             <h4 className="text-md font-medium mb-2">Algae Counts</h4>
             <div className="space-y-2">
-              {Object.entries(team.autonomous.algaeCount).map(([type, count]) => (
+              {Object.entries(isEditing ? editedTeam.autonomous.algaeCount : team.autonomous.algaeCount).map(([type, count]) => (
                 <div key={type} className="flex justify-between items-center">
                   <span className="capitalize">{type.replace(/([A-Z])/g, ' $1').trim()}</span>
-                  <span className="font-medium">{count as number}</span>
+                  {isEditing ? (
+                    <input
+                      type="number"
+                      min="0"
+                      value={count as number}
+                      onChange={(e) => handleNestedChange('autonomous', 'algaeCount', type, parseInt(e.target.value) || 0)}
+                      className="w-16 p-1 border rounded"
+                    />
+                  ) : (
+                    <span className="font-medium">{count as number}</span>
+                  )}
                 </div>
               ))}
             </div>
           </div>
         </div>
+        <div className="mt-2 grid grid-cols-2 gap-4">
+          <div className="bg-default-50 p-4 rounded-lg">
+            <div className="flex justify-between items-center">
+              <span>Auto Start Position</span>
+              {isEditing ? (
+                <input
+                  type="number"
+                  min="1"
+                  max="4"
+                  value={editedTeam.autonomous.autoStart}
+                  onChange={(e) => handleChange('autonomous', 'autoStart', parseInt(e.target.value) || 1)}
+                  className="w-16 p-1 border rounded"
+                />
+              ) : (
+                <span className="font-medium">{team.autonomous.autoStart}</span>
+              )}
+            </div>
+          </div>
+          <div className="bg-default-50 p-4 rounded-lg">
+            <div className="flex justify-between items-center">
+              <span>Left Starting Zone</span>
+              {isEditing ? (
+                <input
+                  type="checkbox"
+                  checked={editedTeam.autonomous.leftStartingZone}
+                  onChange={(e) => handleChange('autonomous', 'leftStartingZone', e.target.checked)}
+                  className="h-5 w-5"
+                />
+              ) : (
+                <span className="font-medium">{team.autonomous.leftStartingZone ? "Yes (+2 pts)" : "No"}</span>
+              )}
+            </div>
+          </div>
+        </div>
         <div className="mt-2 bg-default-50 p-4 rounded-lg">
           <div className="flex justify-between items-center">
-            <span>Auto Start Position</span>
-            <span className="font-medium">{team.autonomous.autoStart}</span>
+            <span>Auto Movement</span>
+            {isEditing ? (
+              <input
+                type="checkbox"
+                checked={editedTeam.endAndAfterGame.autonomousMove}
+                onChange={(e) => handleChange('endAndAfterGame', 'autonomousMove', e.target.checked)}
+                className="h-5 w-5"
+              />
+            ) : (
+              <span className="font-medium">{team.endAndAfterGame.autonomousMove ? "Yes" : "No"}</span>
+            )}
           </div>
         </div>
       </div>
@@ -212,10 +427,20 @@ function TeamStatsModal({ team }) {
           <div className="bg-default-50 p-4 rounded-lg">
             <h4 className="text-md font-medium mb-2">Coral Counts</h4>
             <div className="space-y-2">
-              {Object.entries(team.teleop.coralCount).map(([level, count]) => (
+              {Object.entries(isEditing ? editedTeam.teleop.coralCount : team.teleop.coralCount).map(([level, count]) => (
                 <div key={level} className="flex justify-between items-center">
                   <span className="capitalize">{level.replace(/([A-Z])/g, ' $1').trim()}</span>
-                  <span className="font-medium">{count as number}</span>
+                  {isEditing ? (
+                    <input
+                      type="number"
+                      min="0"
+                      value={count as number}
+                      onChange={(e) => handleNestedChange('teleop', 'coralCount', level, parseInt(e.target.value) || 0)}
+                      className="w-16 p-1 border rounded"
+                    />
+                  ) : (
+                    <span className="font-medium">{count as number}</span>
+                  )}
                 </div>
               ))}
             </div>
@@ -223,13 +448,38 @@ function TeamStatsModal({ team }) {
           <div className="bg-default-50 p-4 rounded-lg">
             <h4 className="text-md font-medium mb-2">Algae Counts</h4>
             <div className="space-y-2">
-              {Object.entries(team.teleop.algaeCount).map(([type, count]) => (
+              {Object.entries(isEditing ? editedTeam.teleop.algaeCount : team.teleop.algaeCount).map(([type, count]) => (
                 <div key={type} className="flex justify-between items-center">
                   <span className="capitalize">{type.replace(/([A-Z])/g, ' $1').trim()}</span>
-                  <span className="font-medium">{count as number}</span>
+                  {isEditing ? (
+                    <input
+                      type="number"
+                      min="0"
+                      value={count as number}
+                      onChange={(e) => handleNestedChange('teleop', 'algaeCount', type, parseInt(e.target.value) || 0)}
+                      className="w-16 p-1 border rounded"
+                    />
+                  ) : (
+                    <span className="font-medium">{count as number}</span>
+                  )}
                 </div>
               ))}
             </div>
+          </div>
+        </div>
+        <div className="mt-2 bg-default-50 p-4 rounded-lg">
+          <div className="flex justify-between items-center">
+            <span>Teleop Movement</span>
+            {isEditing ? (
+              <input
+                type="checkbox"
+                checked={editedTeam.endAndAfterGame.teleopMove}
+                onChange={(e) => handleChange('endAndAfterGame', 'teleopMove', e.target.checked)}
+                className="h-5 w-5"
+              />
+            ) : (
+              <span className="font-medium">{team.endAndAfterGame.teleopMove ? "Yes" : "No"}</span>
+            )}
           </div>
         </div>
       </div>
@@ -237,19 +487,124 @@ function TeamStatsModal({ team }) {
       {/* End Game Stats */}
       <div>
         <h3 className="text-lg font-semibold mb-3">End Game</h3>
-        <div className="bg-default-50 p-4 rounded-lg">
-          <div className="space-y-2">
+        <div className="grid grid-cols-2 gap-4">
+          <div className="bg-default-50 p-4 rounded-lg">
             <div className="flex justify-between items-center">
               <span>Stop Status</span>
-              <span className="font-medium">{team.endAndAfterGame.stopStatus}</span>
+              {isEditing ? (
+                <select
+                  value={editedTeam.endAndAfterGame.stopStatus}
+                  onChange={(e) => handleChange('endAndAfterGame', 'stopStatus', e.target.value)}
+                  className="p-1 border rounded"
+                >
+                  <option value="Park">Park</option>
+                  <option value="Deep Climb">Deep Climb</option>
+                  <option value="Shallow Climb">Shallow Climb</option>
+                  <option value="Failed">Failed</option>
+                  <option value="Played Defense">Played Defense</option>
+                </select>
+              ) : (
+                <span className="font-medium">
+                  {team.endAndAfterGame.stopStatus}
+                  {team.endAndAfterGame.stopStatus === 'Deep Climb' && ' (12pts)'}
+                  {team.endAndAfterGame.stopStatus === 'Shallow Climb' && ' (6pts)'}
+                  {team.endAndAfterGame.stopStatus === 'Park' && ' (2pts)'}
+                </span>
+              )}
             </div>
-            {team.endAndAfterGame.comments && (
-              <div className="mt-2">
-                <span className="block text-sm text-gray-600">Comments:</span>
-                <p className="mt-1">{team.endAndAfterGame.comments}</p>
-              </div>
-            )}
           </div>
+          <div className="bg-default-50 p-4 rounded-lg">
+            <div className="flex justify-between items-center">
+              <span>Climbing Time</span>
+              {isEditing ? (
+                <input
+                  type="number"
+                  min="0"
+                  step="0.1"
+                  value={editedTeam.endAndAfterGame.climbingTime || 0}
+                  onChange={(e) => handleChange('endAndAfterGame', 'climbingTime', parseFloat(e.target.value) || 0)}
+                  className="w-16 p-1 border rounded"
+                />
+              ) : (
+                <span className="font-medium">{team.endAndAfterGame.climbingTime || "N/A"} sec</span>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      {/* Points */}
+      <div>
+        <h3 className="text-lg font-semibold mb-3">Points</h3>
+        <div className="grid grid-cols-3 gap-4">
+          <div className="bg-default-50 p-4 rounded-lg">
+            <div className="flex justify-between items-center">
+              <span>Auto Score</span>
+              <span className="font-medium">{autoScore}</span>
+            </div>
+          </div>
+          <div className="bg-default-50 p-4 rounded-lg">
+            <div className="flex justify-between items-center">
+              <span>Teleop Score</span>
+              <span className="font-medium">{totalTeleopScore}</span>
+            </div>
+          </div>
+          <div className="bg-default-50 p-4 rounded-lg">
+            <div className="flex justify-between items-center">
+              <span>Total Score</span>
+              <span className="font-medium">{autoScore + totalTeleopScore}</span>
+            </div>
+          </div>
+        </div>
+        <div className="mt-2 grid grid-cols-2 gap-4">
+          <div className="bg-default-50 p-4 rounded-lg">
+            <div className="flex justify-between items-center">
+              <span>Ranking Points</span>
+              {isEditing ? (
+                <input
+                  type="number"
+                  min="0"
+                  value={editedTeam.endAndAfterGame.rankingPoint || 0}
+                  onChange={(e) => handleChange('endAndAfterGame', 'rankingPoint', parseInt(e.target.value) || 0)}
+                  className="w-16 p-1 border rounded"
+                />
+              ) : (
+                <span className="font-medium">{team.endAndAfterGame.rankingPoint || 0}</span>
+              )}
+            </div>
+          </div>
+          <div className="bg-default-50 p-4 rounded-lg">
+            <div className="flex justify-between items-center">
+              <span>Coop Point</span>
+              {isEditing ? (
+                <input
+                  type="checkbox"
+                  checked={editedTeam.endAndAfterGame.coopPoint}
+                  onChange={(e) => handleChange('endAndAfterGame', 'coopPoint', e.target.checked)}
+                  className="h-5 w-5"
+                />
+              ) : (
+                <span className="font-medium">{team.endAndAfterGame.coopPoint ? "Yes" : "No"}</span>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Comments */}
+      <div>
+        <h3 className="text-lg font-semibold mb-3">Comments</h3>
+        <div className="bg-default-50 p-4 rounded-lg">
+          {isEditing ? (
+            <textarea
+              value={editedTeam.endAndAfterGame.comments || ""}
+              onChange={(e) => handleChange('endAndAfterGame', 'comments', e.target.value)}
+              className="w-full p-2 border rounded"
+              rows={4}
+            />
+          ) : (
+            <p className="whitespace-pre-wrap">{team.endAndAfterGame.comments || "No comments"}</p>
+          )}
         </div>
       </div>
     </div>
@@ -345,6 +700,7 @@ export function MatchRecordList({ teamNumber, matchType }) {
     const teleopScore = calculateScore(team.teleop, false);
     const endGameScore = calculateEndGameScore(team.endAndAfterGame.stopStatus);
     const totalTeleopScore = teleopScore + endGameScore;
+    const leftZonePoints = team.autonomous.leftStartingZone ? 2 : 0;
     
     return (
       <div key={team.id} className="border-b last:border-b-0 py-4">
@@ -388,6 +744,20 @@ export function MatchRecordList({ teamNumber, matchType }) {
           <div>
             <p className="text-sm text-gray-600">End Game</p>
             <p className="font-medium">{team.endAndAfterGame.stopStatus}</p>
+          </div>
+        </div>
+        <div className="mt-2 grid grid-cols-3 gap-4">
+          <div>
+            <p className="text-sm text-gray-600">Left Zone</p>
+            <p className="font-medium">{team.autonomous.leftStartingZone ? "Yes (+2 pts)" : "No"}</p>
+          </div>
+          <div>
+            <p className="text-sm text-gray-600">Ranking Pts</p>
+            <p className="font-medium">{team.endAndAfterGame.rankingPoint || 0}</p>
+          </div>
+          <div>
+            <p className="text-sm text-gray-600">Coop Point</p>
+            <p className="font-medium">{team.endAndAfterGame.coopPoint ? "Yes" : "No"}</p>
           </div>
         </div>
       </div>
@@ -489,7 +859,7 @@ export function MatchRecordList({ teamNumber, matchType }) {
         </div>
       </Card>
 
-      <Modal
+      <Modal 
         isOpen={isModalOpen} 
         onClose={() => {
           setIsModalOpen(false);
@@ -528,7 +898,7 @@ export function MatchRecordList({ teamNumber, matchType }) {
                   </Button>
                 </div>
               </ModalHeader>
-              <ModalBody className="py-4 sm:py-6 overflow-y-auto">
+              <ModalBody className="py-4 sm:py-6 max-h-[70vh]">
                 <TeamStatsModal team={selectedTeam} />
               </ModalBody>
             </>
@@ -557,11 +927,6 @@ export function MatchRecordList({ teamNumber, matchType }) {
                   </div>
                 </div>
               </ModalBody>
-              <ModalFooter>
-                <Button color="primary" variant="light" onPress={() => setIsModalOpen(false)}>
-                  Close
-                </Button>
-              </ModalFooter>
             </>
           ) : null}
         </ModalContent>

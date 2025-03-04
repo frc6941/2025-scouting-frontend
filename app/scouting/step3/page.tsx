@@ -4,7 +4,7 @@ import { useForm } from "@/app/scouting/contexts/FormContent";
 import { useRouter } from "next/navigation";
 import {Chip} from "@heroui/chip";
 import {Ban, Minus, PersonStanding, Plus, ShoppingBasket} from "lucide-react"
-import { Card, Button, Tooltip } from "@heroui/react";
+import { Card, Button, Tooltip, Checkbox } from "@heroui/react";
 import { Add as AddIcon, Remove as RemoveIcon } from "@mui/icons-material";
 
 export default function Step3() {
@@ -70,6 +70,16 @@ export default function Step3() {
           ...prev.autonomous.algaeCount,
           [key]: Math.max(0, prev.autonomous.algaeCount[key] - 1)
         }
+      }
+    }));
+  };
+
+  const handleLeftStartingZoneChange = (isSelected: boolean) => {
+    setFormData(prev => ({
+      ...prev,
+      autonomous: {
+        ...prev.autonomous,
+        leftStartingZone: isSelected
       }
     }));
   };
@@ -142,6 +152,25 @@ export default function Step3() {
       <div className="text-center mb-8">
         <h1 className="text-3xl font-google-sans font-extrabold mb-1">Autonomous</h1>
         <div className="h-1 w-16 bg-primary mx-auto rounded-full"/>
+      </div>
+
+      <div className="mb-8">
+        <Card className="w-full p-4 backdrop-blur-md hover:shadow-lg transition-shadow duration-200 border-1 border-black dark:border-white">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center">
+              <input
+                type="checkbox"
+                id="leftStartingZone"
+                checked={formData.autonomous.leftStartingZone}
+                onChange={(e) => handleLeftStartingZoneChange(e.target.checked)}
+                className="w-6 h-6 rounded border-gray-300 text-primary focus:ring-primary"
+              />
+              <label htmlFor="leftStartingZone" className="ml-3 text-lg font-medium">
+                Robot left starting zone
+              </label>
+            </div>
+          </div>
+        </Card>
       </div>
 
       <div className="grid md:grid-cols-2 gap-8">
