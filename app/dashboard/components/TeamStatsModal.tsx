@@ -5,7 +5,7 @@ export function TeamStatsModal({ team }) {
   const teleopScore = calculateScore(team.teleop, false);
   const endGameScore = calculateEndGameScore(team.endAndAfterGame.stopStatus);
   const totalTeleopScore = teleopScore + endGameScore;
-  const leftZonePoints = team.autonomous.leftStartingZone ? 2 : 0;
+  const leftZonePoints = team.autonomous.leftStartingZone ? 3 : 0;
 
   return (
     <div className="space-y-6">
@@ -46,7 +46,7 @@ export function TeamStatsModal({ team }) {
         </div>
         <div className="bg-default-50 p-3 rounded-lg">
           <p className="text-sm text-gray-600">Left Starting Zone</p>
-          <p className="font-medium">{team.autonomous.leftStartingZone ? `Yes (+2 pts)` : "No"}</p>
+          <p className="font-medium">{team.autonomous.leftStartingZone ? `Yes (+3 pts)` : "No"}</p>
         </div>
       </div>
 

@@ -448,7 +448,7 @@ function TeamStatsModal({ team, matchNumber }) {
                   className="h-5 w-5"
                 />
               ) : (
-                <span className="font-medium">{team.autonomous.leftStartingZone ? "Yes (+2 pts)" : "No"}</span>
+                <span className="font-medium">{team.autonomous.leftStartingZone ? "Yes (+3 pts)" : "No"}</span>
               )}
             </div>
           </div>
@@ -760,7 +760,7 @@ export function MatchRecordList({ teamNumber, matchType }) {
     const teleopScore = calculateScore(team.teleop, false);
     const endGameScore = calculateEndGameScore(team.endAndAfterGame.stopStatus);
     const totalTeleopScore = teleopScore + endGameScore;
-    const leftZonePoints = team.autonomous.leftStartingZone ? 2 : 0;
+    const leftZonePoints = team.autonomous.leftStartingZone ? 3 : 0;
     
     return (
       <div key={team.id} className="border-b last:border-b-0 py-4">
@@ -807,7 +807,7 @@ export function MatchRecordList({ teamNumber, matchType }) {
         <div className="mt-2 grid grid-cols-3 gap-4">
           <div>
             <p className="text-sm text-gray-600">Left Zone</p>
-            <p className="font-medium">{team.autonomous.leftStartingZone ? "Yes (+2 pts)" : "No"}</p>
+            <p className="font-medium">{team.autonomous.leftStartingZone ? "Yes (+3 pts)" : "No"}</p>
           </div>
           <div>
             <p className="text-sm text-gray-600">Ranking Pts</p>

@@ -37,8 +37,8 @@ export function calculateScore(phase: Phase | null | undefined, isAuto: boolean 
     (phase.algaeCount.netShot || 0) * 4 +
     (phase.algaeCount.processor || 0) * 6;
     
-  // Add 2 points for leaving starting zone in auto phase
-  const leftStartingZonePoints = isAuto && phase.leftStartingZone ? 2 : 0;
+  // Update from 2 to 3 points for leaving starting zone in auto phase
+  const leftStartingZonePoints = isAuto && phase.leftStartingZone ? 3 : 0;
 
   return coralScore + algaeScore + leftStartingZonePoints;
 }

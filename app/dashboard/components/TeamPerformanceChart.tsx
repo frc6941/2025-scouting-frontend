@@ -78,7 +78,7 @@ export function TeamPerformanceChart({ records }) {
       data.autoScores.l4.push((record.autonomous.coralCount.l4 || 0) * 7);
       data.autoScores.processor.push((record.autonomous.algaeCount.processor || 0) * 6);
       data.autoScores.net.push((record.autonomous.algaeCount.netShot || 0) * 4);
-      data.autoScores.leftZone.push(record.autonomous.leftStartingZone ? 2 : 0);
+      data.autoScores.leftZone.push(record.autonomous.leftStartingZone ? 3 : 0);
 
       const autoScore = calculateScore(record.autonomous, true);
       data.autoTotalScores.push(autoScore);
@@ -146,7 +146,7 @@ export function TeamPerformanceChart({ records }) {
       legend: {
         data: [
           'L1 (3pts)', 'L2 (4pts)', 'L3 (6pts)', 'L4 (7pts)',
-          'Processor (6pts)', 'Net (4pts)', 'Left Zone'
+          'Processor (6pts)', 'Net (4pts)', 'Left Zone(3pts)'
         ],
         top: 50,
         padding: [5, 10],
@@ -212,7 +212,7 @@ export function TeamPerformanceChart({ records }) {
           data: data.autoScores.net
         },
         {
-          name: 'Left Zone',
+          name: 'Left Zone(3pts)',
           type: 'bar',
           stack: 'total',
           data: data.autoScores.leftZone
@@ -431,7 +431,7 @@ export function TeamPerformanceChart({ records }) {
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       const record = records.find(r => `Match ${r.matchNumber}` === label);
-      const leftZonePoints = record?.autonomous.leftStartingZone ? 2 : 0;
+      const leftZonePoints = record?.autonomous.leftStartingZone ? 3 : 0;
       
       return (
         <div className="bg-white dark:bg-zinc-900 p-4 rounded-lg shadow-lg border border-gray-200 dark:border-zinc-700">
@@ -440,7 +440,7 @@ export function TeamPerformanceChart({ records }) {
             {payload.map((entry, index) => (
               <p key={index} style={{ color: entry.color }}>
                 {entry.name}: {entry.value}
-                {entry.name === "Auto Score" && record?.autonomous.leftStartingZone && " (incl. 2pts for leaving zone)"}
+                {entry.name === "Auto Score" && record?.autonomous.leftStartingZone && " (incl. 3pts for leaving zone)"}
               </p>
             ))}
           </div>
