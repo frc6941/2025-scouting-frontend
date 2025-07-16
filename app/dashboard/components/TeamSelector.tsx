@@ -7,7 +7,7 @@ import {
   AutocompleteList,
   AutocompleteItem,
 } from "@heroui/react";
-import { Spinner } from "@heroui/react/feedback";
+import { Spinner } from "@heroui/react";
 
 interface Team {
   number: number;
