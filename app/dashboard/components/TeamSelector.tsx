@@ -1,12 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import {
-  Autocomplete,
-  AutocompleteInput,
-  AutocompleteList,
-  AutocompleteItem,
-} from "@heroui/react";
+import { Autocomplete, AutocompleteItem } from "@heroui/react";
 import { Spinner } from "@heroui/react";
 
 interface Team {
@@ -22,7 +17,6 @@ type Props = {
 export function TeamSelector({ selectedTeam, onTeamSelect }: Props) {
   const [teams, setTeams] = useState<Team[]>([]);
   const [loading, setLoading] = useState(true);
-  const [query, setQuery] = useState("");
 
   useEffect(() => {
     fetch(`${process.env.NEXT_PUBLIC_API_URL}/team/findAll`)
@@ -32,45 +26,32 @@ export function TeamSelector({ selectedTeam, onTeamSelect }: Props) {
       .finally(() => setLoading(false));
   }, []);
 
-  const filteredTeams = useMemo(() => {
-    if (!query.trim()) return teams;
-    return teams.filter((t) =>
-      t.number.toString().includes(query.trim())
-    );
-  }, [teams, query]);
+  const handleSelectionChange = (key: React.Key | null) => {
+    onTeamSelect(key ? Number(key) : null);
+  };
 
   return (
     <Autocomplete
-      id="team-autocomplete"
       className="min-w-[220px]"
-      value={selectedTeam?.toString() ?? null}
-      onValueChange={(key) => onTeamSelect(key ? Number(key) : null)}
-      inputValue={query}
-      onInputValueChange={setQuery}
+      selectedKey={selectedTeam?.toString() ?? null}
+      onSelectionChange={handleSelectionChange}
       placeholder="输入队号搜索…"
-      aria-labelledby="team-autocomplete"
+      label="选择队伍"
+      items={teams}
+      isLoading={loading}
+      allowsCustomValue={false}
+      menuTrigger="input"
     >
-      <AutocompleteInput />
-
-      <AutocompleteList>
-        {loading ? (
-          <div className="flex items-center justify-center py-4" role="status">
-            <Spinner size="sm" className="mr-2" />
-            加载中…
+      {(team) => (
+        <AutocompleteItem key={team.number.toString()} textValue={`Team ${team.number}${team.name ? ` - ${team.name}` : ''}`}>
+          <div className="flex flex-col">
+            <span className="font-medium">Team {team.number}</span>
+            {team.name && (
+              <span className="text-small text-gray-500">{team.name}</span>
+            )}
           </div>
-        ) : filteredTeams.length === 0 ? (
-          <div className="py-2 px-4 text-sm text-gray-500">无匹配队伍</div>
-        ) : (
-          filteredTeams.map((team) => (
-            <AutocompleteItem key={team.number.toString()}>
-              <span className="font-medium">Team {team.number}</span>
-              {team.name && (
-                <span className="ml-2 text-gray-500">{team.name}</span>
-              )}
-            </AutocompleteItem>
-          ))
-        )}
-      </AutocompleteList>
+        </AutocompleteItem>
+      )}
     </Autocomplete>
   );
 }
