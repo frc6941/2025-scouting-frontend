@@ -30,6 +30,18 @@ export function TeamSelector({ selectedTeam, onTeamSelect }: Props) {
     onTeamSelect(key ? Number(key) : null);
   };
 
+  // 自定义过滤函数，只按团队编号精确搜索
+  const customFilter = (textValue: string, inputValue: string) => {
+    if (!inputValue.trim()) return true; // 空输入显示所有队伍
+    
+    // 从textValue中提取团队编号（去掉"Team "前缀）
+    const teamNumber = textValue.replace(/^Team\s+/, '').trim();
+    
+    // 只匹配编号开头或包含输入的数字
+    // 例如：输入"5"匹配"5", "15", "25"等，但不匹配名称中的"5"
+    return teamNumber.includes(inputValue.trim());
+  };
+
   return (
     <Autocomplete
       className="min-w-[220px]"
@@ -41,9 +53,13 @@ export function TeamSelector({ selectedTeam, onTeamSelect }: Props) {
       isLoading={loading}
       allowsCustomValue={false}
       menuTrigger="input"
+      defaultFilter={customFilter}
     >
       {(team) => (
-        <AutocompleteItem key={team.number.toString()} textValue={`Team ${team.number}${team.name ? ` - ${team.name}` : ''}`}>
+        <AutocompleteItem 
+          key={team.number.toString()} 
+          textValue={`Team ${team.number}`}
+        >
           <div className="flex flex-col">
             <span className="font-medium">Team {team.number}</span>
             {team.name && (
