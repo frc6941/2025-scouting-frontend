@@ -1,11 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import {
-  Autocomplete,
-  AutocompleteItem,
-  Spinner,
-} from "@heroui/react";
+import React, { useState, useEffect } from "react";
+import { Autocomplete, AutocompleteItem } from "@heroui/react";
 
 interface Team { 
   number: number; 
@@ -20,6 +16,7 @@ type Props = {
 export function TeamSelector({ selectedTeam, onTeamSelect }: Props) {
   const [teams, setTeams] = useState<Team[]>([]);
   const [loading, setLoading] = useState(true);
+  const [inputValue, setInputValue] = useState("");
 
   useEffect(() => {
     fetch(`${process.env.NEXT_PUBLIC_API_URL}/team/findAll`)
@@ -29,23 +26,27 @@ export function TeamSelector({ selectedTeam, onTeamSelect }: Props) {
       .finally(() => setLoading(false));
   }, []);
 
+  const onSelectionChange = (key: React.Key | null) => {
+    onTeamSelect(key ? Number(key) : null);
+  };
+
+  const onInputChange = (value: string) => {
+    setInputValue(value);
+  };
+
   return (
     <Autocomplete
       className="min-w-[220px]"
-      selectedKey={selectedTeam?.toString() ?? null}
-      onSelectionChange={(key) => onTeamSelect(key ? Number(key) : null)}
-      placeholder="输入队号搜索…"
+      defaultItems={teams}
       label="选择队伍"
-      items={teams}
-      isLoading={loading}
+      placeholder="输入队号搜索…"
       allowsCustomValue={false}
-      menuTrigger="input"
+      onInputChange={onInputChange}
+      onSelectionChange={onSelectionChange}
+      isLoading={loading}
     >
       {(team) => (
-        <AutocompleteItem
-          key={team.number.toString()}
-          textValue={team.number.toString()}
-        >
+        <AutocompleteItem key={team.number.toString()} textValue={team.number.toString()}>
           <div className="flex flex-col">
             <span className="font-medium">Team {team.number}</span>
             {team.name && (
