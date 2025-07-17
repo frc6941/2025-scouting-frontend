@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Card, Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@heroui/react";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { Card, Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input } from "@heroui/react";
+import { ChevronDown, ChevronUp, Trash2 } from "lucide-react";
 import { calculateScore, calculateEndGameScore } from '@/app/lib/utils';
 import { toast } from "@/hooks/use-toast";
 import { getCookie } from 'cookies-next/client';
@@ -186,7 +186,7 @@ function MatchStatsModal({ match, onClose }) {
 }
 
 // Update the TeamStatsModal component to include team number and match number fields
-function TeamStatsModal({ team, matchNumber }) {
+function TeamStatsModal({ team, matchNumber, onDelete }) {
   const autoScore = calculateScore(team.autonomous, true);
   const teleopScore = calculateScore(team.teleop, false);
   const endGameScore = calculateEndGameScore(team.endAndAfterGame.stopStatus);
@@ -195,6 +195,10 @@ function TeamStatsModal({ team, matchNumber }) {
   // Add state for editing mode
   const [isEditing, setIsEditing] = useState(false);
   const [editedTeam, setEditedTeam] = useState({...team});
+  
+  // Add state for delete confirmation modal
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteMatchNumber, setDeleteMatchNumber] = useState("");
   
   // Handle field changes
   const handleChange = (section, field, value) => {
@@ -302,16 +306,74 @@ function TeamStatsModal({ team, matchNumber }) {
     }
   };
 
+  // Handle delete confirmation
+  const handleDeleteConfirm = async () => {
+    if (deleteMatchNumber !== matchNumber.toString()) {
+      toast({
+        title: "Error",
+        description: "Match number does not match. Please enter the correct match number.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || '';
+      if (!apiUrl) {
+        toast({
+          title: "Configuration Error",
+          description: "API URL is not configured.",
+          variant: "destructive"
+        });
+        return;
+      }
+      
+      const response = await fetch(`${apiUrl}/scouting/delete/${team.id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${getCookie('Authorization')}`
+        }
+      });
+      
+      if (response.ok) {
+        toast({
+          title: "Success",
+          description: "Record deleted successfully",
+          variant: "default"
+        });
+        setShowDeleteModal(false);
+        setDeleteMatchNumber("");
+        if (onDelete) {
+          onDelete();
+        }
+      } else {
+        const errorData = await response.json();
+        toast({
+          title: "Error",
+          description: errorData.message || "Failed to delete record",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      console.error("Error deleting record:", error);
+      toast({
+        title: "Connection Error",
+        description: "Could not connect to the API server.",
+        variant: "destructive"
+      });
+    }
+  };
+
   return (
+    <>
     <div className="overflow-y-auto">
-      {/* Add Edit/Save buttons at the top */}
-      <div className="flex justify-end mb-4 sticky top-0 bg-white dark:bg-zinc-900 z-10 py-2">
+        {/* Add Edit/Save/Delete buttons at the top */}
+        <div className="flex justify-end mb-4 sticky top-0 bg-white dark:bg-zinc-900 z-10 py-2 gap-2">
         {isEditing ? (
           <>
             <Button 
               color="success" 
               size="sm" 
-              className="mr-2"
               onPress={handleSave}
             >
               Save
@@ -328,6 +390,16 @@ function TeamStatsModal({ team, matchNumber }) {
             </Button>
           </>
         ) : (
+            <>
+              <Button 
+                color="danger" 
+                size="sm"
+                variant="light"
+                startContent={<Trash2 className="w-4 h-4" />}
+                onPress={() => setShowDeleteModal(true)}
+              >
+                Delete
+              </Button>
           <Button 
             color="primary" 
             size="sm"
@@ -335,6 +407,7 @@ function TeamStatsModal({ team, matchNumber }) {
           >
             Edit
           </Button>
+            </>
         )}
       </div>
       
@@ -453,21 +526,6 @@ function TeamStatsModal({ team, matchNumber }) {
             </div>
           </div>
         </div>
-        <div className="mt-2 bg-default-50 p-4 rounded-lg">
-          <div className="flex justify-between items-center">
-            <span>Auto Movement</span>
-            {isEditing ? (
-              <input
-                type="checkbox"
-                checked={editedTeam.endAndAfterGame.autonomousMove}
-                onChange={(e) => handleChange('endAndAfterGame', 'autonomousMove', e.target.checked)}
-                className="h-5 w-5"
-              />
-            ) : (
-              <span className="font-medium">{team.endAndAfterGame.autonomousMove ? "Yes" : "No"}</span>
-            )}
-          </div>
-        </div>
       </div>
 
       {/* Teleop Stats */}
@@ -517,27 +575,12 @@ function TeamStatsModal({ team, matchNumber }) {
             </div>
           </div>
         </div>
-        <div className="mt-2 bg-default-50 p-4 rounded-lg">
-          <div className="flex justify-between items-center">
-            <span>Teleop Movement</span>
-            {isEditing ? (
-              <input
-                type="checkbox"
-                checked={editedTeam.endAndAfterGame.teleopMove}
-                onChange={(e) => handleChange('endAndAfterGame', 'teleopMove', e.target.checked)}
-                className="h-5 w-5"
-              />
-            ) : (
-              <span className="font-medium">{team.endAndAfterGame.teleopMove ? "Yes" : "No"}</span>
-            )}
-          </div>
-        </div>
       </div>
 
       {/* End Game Stats */}
       <div>
         <h3 className="text-lg font-semibold mb-3">End Game</h3>
-        <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="bg-default-50 p-4 rounded-lg">
             <div className="flex justify-between items-center">
               <span>Stop Status</span>
@@ -547,69 +590,18 @@ function TeamStatsModal({ team, matchNumber }) {
                   onChange={(e) => handleChange('endAndAfterGame', 'stopStatus', e.target.value)}
                   className="p-1 border rounded"
                 >
-                  <option value="Park">Park</option>
-                  <option value="Deep Climb">Deep Climb</option>
-                  <option value="Shallow Climb">Shallow Climb</option>
-                  <option value="Failed">Failed</option>
-                  <option value="Played Defense">Played Defense</option>
+                    <option value="NONE">None</option>
+                    <option value="SHALLOW">Shallow</option>
+                    <option value="DEEP">Deep</option>
                 </select>
               ) : (
-                <span className="font-medium">
-                  {team.endAndAfterGame.stopStatus}
-                  {team.endAndAfterGame.stopStatus === 'Deep Climb' && ' (12pts)'}
-                  {team.endAndAfterGame.stopStatus === 'Shallow Climb' && ' (6pts)'}
-                  {team.endAndAfterGame.stopStatus === 'Park' && ' (2pts)'}
-                </span>
+                  <span className="font-medium">{team.endAndAfterGame.stopStatus}</span>
               )}
             </div>
           </div>
           <div className="bg-default-50 p-4 rounded-lg">
             <div className="flex justify-between items-center">
-              <span>Climbing Time</span>
-              {isEditing ? (
-                <input
-                  type="number"
-                  min="0"
-                  step="0.1"
-                  value={editedTeam.endAndAfterGame.climbingTime || 0}
-                  onChange={(e) => handleChange('endAndAfterGame', 'climbingTime', parseFloat(e.target.value) || 0)}
-                  className="w-16 p-1 border rounded"
-                />
-              ) : (
-                <span className="font-medium">{team.endAndAfterGame.climbingTime || "N/A"} sec</span>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      {/* Points */}
-      <div>
-        <h3 className="text-lg font-semibold mb-3">Points</h3>
-        <div className="grid grid-cols-3 gap-4">
-          <div className="bg-default-50 p-4 rounded-lg">
-            <div className="flex justify-between items-center">
-              <span>Auto Score</span>
-              <span className="font-medium">{autoScore}</span>
-            </div>
-          </div>
-          <div className="bg-default-50 p-4 rounded-lg">
-            <div className="flex justify-between items-center">
-              <span>Teleop Score</span>
-              <span className="font-medium">{totalTeleopScore}</span>
-            </div>
-          </div>
-          <div className="bg-default-50 p-4 rounded-lg">
-            <div className="flex justify-between items-center">
-              <span>Total Score</span>
-              <span className="font-medium">{autoScore + totalTeleopScore}</span>
-            </div>
-          </div>
-        </div>
-        <div className="mt-2 grid grid-cols-2 gap-4">
-          <div className="bg-default-50 p-4 rounded-lg">
-            <div className="flex justify-between items-center">
-              <span>Ranking Points</span>
+                <span>Ranking Point</span>
               {isEditing ? (
                 <input
                   type="number"
@@ -623,6 +615,8 @@ function TeamStatsModal({ team, matchNumber }) {
               )}
             </div>
           </div>
+          </div>
+          <div className="mt-2">
           <div className="bg-default-50 p-4 rounded-lg">
             <div className="flex justify-between items-center">
               <span>Coop Point</span>
@@ -639,25 +633,75 @@ function TeamStatsModal({ team, matchNumber }) {
             </div>
           </div>
         </div>
-      </div>
-
-      {/* Comments */}
-      <div>
-        <h3 className="text-lg font-semibold mb-3">Comments</h3>
+          <div className="mt-2">
         <div className="bg-default-50 p-4 rounded-lg">
+              <div className="flex flex-col">
+                <span className="mb-2">Comments</span>
           {isEditing ? (
             <textarea
               value={editedTeam.endAndAfterGame.comments || ""}
               onChange={(e) => handleChange('endAndAfterGame', 'comments', e.target.value)}
-              className="w-full p-2 border rounded"
-              rows={4}
+                    className="w-full p-2 border rounded min-h-[80px]"
+                    placeholder="Enter comments..."
             />
           ) : (
-            <p className="whitespace-pre-wrap">{team.endAndAfterGame.comments || "No comments"}</p>
+                  <span className="font-medium">{team.endAndAfterGame.comments || "No comments"}</span>
           )}
         </div>
       </div>
     </div>
+        </div>
+        
+        {/* Score Summary */}
+        <div className="mt-6">
+          <h3 className="text-lg font-semibold mb-3">Score Summary</h3>
+          <div className="grid grid-cols-3 gap-4">
+            <div className="bg-default-50 p-4 rounded-lg text-center">
+              <p className="text-sm text-gray-600">Auto Score</p>
+              <p className="text-xl font-bold">{autoScore}</p>
+            </div>
+            <div className="bg-default-50 p-4 rounded-lg text-center">
+              <p className="text-sm text-gray-600">Teleop Score</p>
+              <p className="text-xl font-bold">{totalTeleopScore}</p>
+            </div>
+            <div className="bg-default-50 p-4 rounded-lg text-center">
+              <p className="text-sm text-gray-600">Total Score</p>
+              <p className="text-xl font-bold">{autoScore + totalTeleopScore}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Delete Confirmation Modal */}
+      <Modal isOpen={showDeleteModal} onClose={() => setShowDeleteModal(false)}>
+        <ModalContent>
+          <ModalHeader>Confirm Delete</ModalHeader>
+          <ModalBody>
+            <p className="mb-4">
+              Are you sure you want to delete this record for Team {team.team} in Match {matchNumber}?
+            </p>
+            <p className="mb-4 text-sm text-gray-600">
+              This action cannot be undone. Please enter the match number to confirm.
+            </p>
+            <Input
+              type="number"
+              label="Match Number"
+              placeholder={`Enter ${matchNumber} to confirm`}
+              value={deleteMatchNumber}
+              onChange={(e) => setDeleteMatchNumber(e.target.value)}
+            />
+          </ModalBody>
+          <ModalFooter>
+            <Button color="danger" onPress={handleDeleteConfirm}>
+              Delete
+            </Button>
+            <Button color="default" onPress={() => setShowDeleteModal(false)}>
+              Cancel
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    </>
   );
 }
 
@@ -977,7 +1021,17 @@ export function MatchRecordList({ teamNumber, matchType }) {
                 </div>
               </ModalHeader>
               <ModalBody className="py-4 overflow-y-auto flex-grow">
-                <TeamStatsModal team={selectedTeam} matchNumber={selectedTeam.matchNumber} />
+                <TeamStatsModal 
+                  team={selectedTeam} 
+                  matchNumber={selectedTeam.matchNumber} 
+                  onDelete={() => {
+                    setSelectedTeam(null);
+                    setShowTeamStats(false);
+                    setIsModalOpen(false);
+                    // Refresh the data
+                    window.location.reload();
+                  }} 
+                />
               </ModalBody>
             </>
           ) : selectedMatch && selectedMatch.teams ? (

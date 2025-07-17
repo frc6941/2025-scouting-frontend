@@ -3,9 +3,9 @@
 import React, { useState, useEffect } from "react";
 import { Autocomplete, AutocompleteItem } from "@heroui/react";
 
-interface Team { 
-  number: number; 
-  name?: string; 
+interface Team {
+  number: number;
+  name?: string;
 }
 
 type Props = {
@@ -48,13 +48,13 @@ export function TeamSelector({ selectedTeam, onTeamSelect }: Props) {
       {(team) => (
         <AutocompleteItem key={team.number.toString()} textValue={team.number.toString()}>
           <div className="flex flex-col">
-            <span className="font-medium">Team {team.number}</span>
-            {team.name && (
+              <span className="font-medium">Team {team.number}</span>
+              {team.name && (
               <span className="text-sm text-gray-500">{team.name}</span>
-            )}
+              )}
           </div>
-        </AutocompleteItem>
-      )}
+            </AutocompleteItem>
+        )}
     </Autocomplete>
   );
 }
