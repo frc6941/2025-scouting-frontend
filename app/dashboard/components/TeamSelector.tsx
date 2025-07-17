@@ -1,15 +1,25 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Autocomplete, AutocompleteItem, Spinner } from "@heroui/react";
+import {
+  Autocomplete,
+  AutocompleteItem,
+  Spinner,
+} from "@heroui/react";
 
-interface Team { number: number; name?: string; }
-type Props = { selectedTeam: number | null; onTeamSelect: (n: number|null)=>void; };
+interface Team { 
+  number: number; 
+  name?: string; 
+}
+
+type Props = {
+  selectedTeam: number | null;
+  onTeamSelect: (n: number | null) => void;
+};
 
 export function TeamSelector({ selectedTeam, onTeamSelect }: Props) {
   const [teams, setTeams] = useState<Team[]>([]);
   const [loading, setLoading] = useState(true);
-  const [query, setQuery] = useState("");
 
   useEffect(() => {
     fetch(`${process.env.NEXT_PUBLIC_API_URL}/team/findAll`)
@@ -19,31 +29,22 @@ export function TeamSelector({ selectedTeam, onTeamSelect }: Props) {
       .finally(() => setLoading(false));
   }, []);
 
-  const customFilter = (text: string, input: string) => {
-    const q = input.trim();
-    if (!q) return true;
-    const num = text.replace(/^Team\s+/, "");
-    return num.includes(q);
-  };
-
   return (
     <Autocomplete
       className="min-w-[220px]"
-      value={selectedTeam?.toString() ?? null}
-      onValueChange={(key) => onTeamSelect(key ? Number(key) : null)}
-      inputValue={query}
-      onInputValueChange={setQuery}
+      selectedKey={selectedTeam?.toString() ?? null}
+      onSelectionChange={(key) => onTeamSelect(key ? Number(key) : null)}
       placeholder="输入队号搜索…"
-      defaultItems={teams}
-      defaultFilter={customFilter}
+      label="选择队伍"
+      items={teams}
+      isLoading={loading}
       allowsCustomValue={false}
       menuTrigger="input"
-      loading={loading}
     >
-      {teams.map((team) => (
+      {(team) => (
         <AutocompleteItem
           key={team.number.toString()}
-          textValue={`Team ${team.number}`}
+          textValue={team.number.toString()}
         >
           <div className="flex flex-col">
             <span className="font-medium">Team {team.number}</span>
@@ -52,12 +53,6 @@ export function TeamSelector({ selectedTeam, onTeamSelect }: Props) {
             )}
           </div>
         </AutocompleteItem>
-      ))}
-      {loading && (
-        <div className="flex items-center justify-center py-4" role="status">
-          <Spinner size="sm" className="mr-2" />
-          加载中…
-        </div>
       )}
     </Autocomplete>
   );
