@@ -84,10 +84,10 @@ export default function GameLayout() {
             <div className="space-y-8">
               <div>
                 <h2 className="text-xl text-default-600 font-google-sans font-extrabold mb-4">
-                  Instructions
+                  Instructions (可以随便填)
                 </h2>
                 <p className="text-default-600 font-google-sans text-lg">
-                  Click on one of the highlighted positions on the field to indicate your robot's starting position.
+                  Click on one of the highlighted positions on the field to indicate your robot's starting position. 
                 </p>
               </div>
 

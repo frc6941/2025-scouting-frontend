@@ -673,29 +673,32 @@ function TeamStatsModal({ team, matchNumber, onDelete }) {
       </div>
 
       {/* Delete Confirmation Modal */}
-      <Modal isOpen={showDeleteModal} onClose={() => setShowDeleteModal(false)}>
-        <ModalContent>
-          <ModalHeader>Confirm Delete</ModalHeader>
-          <ModalBody>
+      <Modal isOpen={showDeleteModal} onClose={() => setShowDeleteModal(false)} size="sm">
+        <ModalContent className="max-w-md mx-auto">
+          <ModalHeader className="text-center">Confirm Delete</ModalHeader>
+          <ModalBody className="text-center">
             <p className="mb-4">
               Are you sure you want to delete this record for Team {team.team} in Match {matchNumber}?
             </p>
             <p className="mb-4 text-sm text-gray-600">
               This action cannot be undone. Please enter the match number to confirm.
             </p>
-            <Input
-              type="number"
-              label="Match Number"
-              placeholder={`Enter ${matchNumber} to confirm`}
-              value={deleteMatchNumber}
-              onChange={(e) => setDeleteMatchNumber(e.target.value)}
-            />
+            <div className="flex justify-center">
+              <Input
+                type="number"
+                label="Match Number"
+                placeholder={`Enter ${matchNumber} to confirm`}
+                value={deleteMatchNumber}
+                onChange={(e) => setDeleteMatchNumber(e.target.value)}
+                className="max-w-32"
+              />
+            </div>
           </ModalBody>
-          <ModalFooter>
-            <Button color="danger" onPress={handleDeleteConfirm}>
+          <ModalFooter className="justify-center gap-2">
+            <Button color="danger" size="sm" onPress={handleDeleteConfirm}>
               Delete
             </Button>
-            <Button color="default" onPress={() => setShowDeleteModal(false)}>
+            <Button color="default" size="sm" onPress={() => setShowDeleteModal(false)}>
               Cancel
             </Button>
           </ModalFooter>
