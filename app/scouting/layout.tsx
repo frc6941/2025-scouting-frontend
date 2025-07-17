@@ -1,7 +1,7 @@
 'use client'
 
 import { FormProvider } from "@/app/scouting/contexts/FormContent";
-import {Tabs, Tab} from "@heroui/tabs";
+import {Tabs, Tab} from "@heroui/react";
 import {usePathname, useRouter} from "next/navigation";
 
 export default function RootLayout({ children }) {

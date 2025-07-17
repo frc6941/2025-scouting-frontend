@@ -164,7 +164,7 @@ const Step5 = () => {
           
           <div className="mt-4">
             <label htmlFor="climbingTime" className="block text-lg mb-2">
-              Climbing Time (seconds)
+              Climbing Time (seconds) (从操作手想要开始爬升到成功离地之间的时长 (成功离地指离地之后造成有效爬升))
             </label>
             <Input
               id="climbingTime"

@@ -21,6 +21,8 @@ const ParamsComponent = () => {
         }
       );
       const token: Response = await data.json();
+      console.log(token);
+      console.log(token.accessToken);
       setCookie("Authorization", token.accessToken);
       await new Promise(resolve => setTimeout(resolve, 300));
       window.location.href = "/";

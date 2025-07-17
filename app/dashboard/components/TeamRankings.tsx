@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import { Card } from "@heroui/react";
-import { Select, SelectItem } from "@nextui-org/react";
+import { Select, SelectItem } from "@heroui/react";
 import { calculateScore, calculateEndGameScore } from '@/app/lib/utils';
 
 interface MatchRecord {

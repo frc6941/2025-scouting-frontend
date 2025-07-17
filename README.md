@@ -1,46 +1,139 @@
-# IronPulse 2025 Reefscape Scouting Frontend
-## Demo
-<img width="1390" alt="image" src="https://github.com/user-attachments/assets/02ce2dc6-552d-4f75-acab-b082947e375d" />
-<img width="1375" alt="image" src="https://github.com/user-attachments/assets/81d76d2c-faf2-4976-a64a-93b30036b519" />
-<img width="1381" alt="image" src="https://github.com/user-attachments/assets/952b9884-853b-4744-8c92-f8b00d5b7050" />
-<img width="1378" alt="image" src="https://github.com/user-attachments/assets/67a4b8d3-f8b9-44fe-ac49-3e10bca2c6bb" />
-<img width="1363" alt="image" src="https://github.com/user-attachments/assets/8adb3cdb-14b6-4640-b8c5-b82d015ef040" />
-<img width="1388" alt="image" src="https://github.com/user-attachments/assets/6fd9ef6f-13dd-43b9-a214-f6b445c00554" />
-<img width="1381" alt="image" src="https://github.com/user-attachments/assets/d4f569fe-6976-488e-882a-864b0dd8b966" />
+# 2025 Scouting Frontend
 
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+一个用于FRC机器人比赛数据收集和分析的现代化前端应用。
 
-## Getting Started
+## 功能特性
 
-First, run the development server:
+- 🤖 比赛数据收集和管理
+- 📊 团队性能分析和图表展示
+- 🔍 团队搜索和比较
+- 📱 响应式设计，支持移动设备
+- 🌙 深色/浅色主题切换
+
+## 技术栈
+
+- **框架**: Next.js 15
+- **UI库**: HeroUI (React组件库)
+- **样式**: Tailwind CSS
+- **图表**: ECharts
+- **状态管理**: React Hooks
+- **类型检查**: TypeScript
+
+## 安装和运行
+
+### 前置要求
+
+确保你的系统已安装：
+- Node.js (18.x 或更高版本)
+- npm 或 yarn
+
+### 安装依赖
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# 使用npm
+npm install
+
+# 或使用yarn
+yarn install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 环境配置
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+创建 `.env.local` 文件并配置API端点：
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```env
+NEXT_PUBLIC_API_URL=http://localhost:3001/api
+```
 
-## Learn More
+### 运行开发服务器
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+# 使用npm
+npm run dev
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# 或使用yarn
+yarn dev
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+应用将在 http://localhost:3000 启动。
 
-## Deploy on Vercel
+### 构建生产版本
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+# 使用npm
+npm run build
+npm start
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+# 或使用yarn
+yarn build
+yarn start
+```
+
+## 项目结构
+
+```
+├── app/                    # Next.js 13+ App Router
+│   ├── dashboard/         # 仪表板页面和组件
+│   ├── scouting/          # 数据收集表单
+│   ├── pit-scouting/      # 维修站侦察
+│   └── auth/              # 认证相关
+├── components/            # 共享UI组件
+├── hooks/                 # 自定义React Hooks
+├── public/               # 静态资源
+└── ...
+```
+
+## 组件说明
+
+### TeamSelector
+- 使用HeroUI Autocomplete组件
+- 支持实时搜索和筛选
+- 显示团队编号和名称
+
+### Dashboard
+- 团队性能图表
+- 比赛记录列表
+- 多标签页界面
+
+## 开发指南
+
+### 添加新组件
+
+1. 在 `components/` 或相应的页面目录下创建组件
+2. 使用TypeScript定义接口
+3. 遵循现有的命名约定
+
+### 样式指南
+
+- 使用Tailwind CSS类名
+- 组件特定样式使用HeroUI的classNames属性
+- 保持一致的间距和配色
+
+## 故障排除
+
+### 常见问题
+
+1. **依赖冲突**: 确保只使用HeroUI，移除NextUI依赖
+2. **环境变量**: 检查 `.env.local` 文件配置
+3. **API连接**: 确认后端API服务正在运行
+
+### 依赖清理
+
+如果遇到依赖问题，可以清理并重新安装：
+
+```bash
+rm -rf node_modules package-lock.json
+npm install
+```
+
+## 贡献
+
+1. Fork此仓库
+2. 创建功能分支 (`git checkout -b feature/AmazingFeature`)
+3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
+4. 推送到分支 (`git push origin feature/AmazingFeature`)
+5. 打开Pull Request
+
+## 许可证
+
+此项目使用MIT许可证 - 查看 [LICENSE](LICENSE) 文件了解详情。

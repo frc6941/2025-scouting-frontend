@@ -2,10 +2,8 @@
 
 import { useForm } from "@/app/scouting/contexts/FormContent";
 import { useRouter } from "next/navigation";
-import { Input } from "@heroui/input";
-import { Button, Card } from "@heroui/react";
+import { Input, Button, Card, Select, SelectItem } from "@heroui/react";
 import { toast } from "@/hooks/use-toast";
-import { Select, SelectItem } from "@heroui/react";
 
 enum MatchType {
   QUAL = 'Qualification',
